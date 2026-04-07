@@ -348,9 +348,9 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {realWinners && realWinners.length > 0 ? (
                 realWinners.map((w) => {
-                  const user = w.users as { email: string } | null
-                  const comp = w.competitions as { title: string; prize_amount: number; crypto_type: string } | null
-                  const ticket = w.tickets as { ticket_number: number } | null
+                  const user = (w.users as unknown as { email: string }[] | null)?.[0] ?? null
+                  const comp = (w.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                  const ticket = (w.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
                   const daysAgo = Math.floor((Date.now() - new Date(w.created_at).getTime()) / 86400000)
                   return (
                     <div

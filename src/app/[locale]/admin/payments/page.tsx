@@ -46,7 +46,7 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
 
   const filtered = q
     ? (payments ?? []).filter((p) => {
-        const u = p.users as { email: string } | null
+        const u = (p.users as unknown as { email: string }[] | null)?.[0] ?? null
         return u?.email?.toLowerCase().includes(q.toLowerCase())
       })
     : (payments ?? [])
@@ -107,8 +107,8 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
 
         {filtered.length > 0 ? (
           filtered.map((p) => {
-            const user = p.users as { email: string } | null
-            const comp = p.competitions as { title: string } | null
+            const user = (p.users as unknown as { email: string }[] | null)?.[0] ?? null
+            const comp = (p.competitions as unknown as { title: string }[] | null)?.[0] ?? null
             return (
               <div
                 key={p.id}

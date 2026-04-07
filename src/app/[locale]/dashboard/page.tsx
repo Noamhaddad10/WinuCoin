@@ -72,7 +72,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   // Set of ticket numbers belonging to winning tickets
   const winningTicketNumbers = new Set(
-    (userWins ?? []).map((w) => (w.tickets as { ticket_number: number } | null)?.ticket_number)
+    (userWins ?? []).map((w) => (w.tickets as unknown as { ticket_number: number }[] | null)?.[0]?.ticket_number)
   )
 
   const displayName = profile?.full_name ?? user?.email ?? ''
@@ -100,8 +100,8 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           {userWins && userWins.length > 0 && (
             <div className="mt-6 space-y-3">
               {userWins.map((win) => {
-                const comp = win.competitions as { title: string; prize_amount: number; crypto_type: string } | null
-                const ticket = win.tickets as { ticket_number: number } | null
+                const comp = (win.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                const ticket = (win.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
                 return (
                   <div
                     key={win.id}

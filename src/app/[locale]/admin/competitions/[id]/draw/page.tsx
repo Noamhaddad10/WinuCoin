@@ -33,8 +33,8 @@ export default async function DrawWinnerPage({ params }: PageProps) {
 
   if (!competition) notFound()
 
-  const winnerUser = existingWinner?.users as { email: string } | null
-  const winnerTicket = existingWinner?.tickets as { ticket_number: number } | null
+  const winnerUser = (existingWinner?.users as unknown as { email: string }[] | null)?.[0] ?? null
+  const winnerTicket = (existingWinner?.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
 
   return (
     <>

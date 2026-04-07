@@ -96,8 +96,8 @@ export default async function CompetitionDetailPage({
   ])
 
   const cryptoPrice = prices[competition.crypto_type] ?? null
-  const winnerTicket = winnerData?.tickets as { ticket_number: number } | null
-  const winnerUser = winnerData?.users as { email: string } | null
+  const winnerTicket = (winnerData?.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
+  const winnerUser = (winnerData?.users as unknown as { email: string }[] | null)?.[0] ?? null
 
   const isSoldOut = competition.tickets_sold >= competition.max_tickets
   const isEnded = competition.status !== 'active'
