@@ -120,8 +120,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
               ))}
             </div>
             {recentPayments.map((p) => {
-              const users = p.users as { email: string } | null
-              const competitions = p.competitions as { title: string } | null
+              const users = (p.users as unknown as { email: string }[] | null)?.[0] ?? null
+              const competitions = (p.competitions as unknown as { title: string }[] | null)?.[0] ?? null
               return (
                 <div
                   key={p.id}
