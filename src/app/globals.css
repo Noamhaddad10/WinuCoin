@@ -1,5 +1,50 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulsing green glow for "Active" status indicators */
+@keyframes status-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.70);
+    opacity: 1;
+  }
+  60% {
+    box-shadow: 0 0 0 5px rgba(74, 222, 128, 0);
+    opacity: 0.75;
+  }
+}
+
+.animate-float {
+  animation: float 7s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 9s ease-in-out infinite 1.5s;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-status-pulse {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
 @layer base {
   :root {
     --background: 255 255 255;
@@ -15,12 +60,12 @@
   }
 
   .dark {
-    --background: 10 10 10;
+    --background: 9 9 11;
     --foreground: 237 237 237;
-    --muted: 20 20 20;
+    --muted: 24 24 27;
     --muted-foreground: 148 163 184;
     --border: 39 39 42;
-    --card: 20 20 20;
+    --card: 24 24 27;
     --card-foreground: 237 237 237;
     --primary: 99 102 241;
     --primary-foreground: 255 255 255;

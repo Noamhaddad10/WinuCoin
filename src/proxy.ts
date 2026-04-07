@@ -14,6 +14,11 @@ export async function proxy(request: NextRequest) {
   const locale = localeMatch ? localeMatch[1] : routing.defaultLocale
   const pathWithoutLocale = localeMatch ? (localeMatch[2] ?? '/') : pathname
 
+  // API routes and auth callback must not go through intl redirect
+  if (pathname.startsWith('/api/') || pathname === '/auth/callback') {
+    return NextResponse.next()
+  }
+
   const isProtectedRoute =
     pathWithoutLocale.startsWith('/dashboard') ||
     pathWithoutLocale.startsWith('/admin')
@@ -73,7 +78,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except static assets
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Match all paths except static assets and API routes
+    '/((?!api/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

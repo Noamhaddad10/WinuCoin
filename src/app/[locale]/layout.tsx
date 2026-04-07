@@ -15,8 +15,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'WinuCoin',
-    template: '%s | WinuCoin',
+    default: 'WinuWallet',
+    template: '%s | WinuWallet',
   },
   description: 'Win real cryptocurrency prizes through transparent, provably fair competitions.',
 }

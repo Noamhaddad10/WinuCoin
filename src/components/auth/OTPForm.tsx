@@ -46,7 +46,7 @@ export function OTPForm({ email, locale, onBack }: OTPFormProps) {
         return
       }
 
-      router.push(`/${locale}/dashboard`)
+      router.push(`/${locale}`)
       router.refresh()
     })
   }
