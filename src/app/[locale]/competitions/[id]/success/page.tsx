@@ -122,7 +122,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
                   <div className="mt-3 flex flex-wrap gap-2">
                     {tickets!.map((ticket) => (
                       <span
-                        key={ticket.ticket_number}
+                        key={ticket.id}
                         className="rounded-lg bg-white px-3 py-1 font-mono text-sm font-bold text-indigo-700 shadow-sm ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-indigo-700/40"
                       >
                         #{ticket.ticket_number}
