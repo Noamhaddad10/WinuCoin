@@ -49,7 +49,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
   const { data: tickets } = payment
     ? await admin
         .from('tickets')
-        .select('ticket_number')
+        .select('id, ticket_number')
         .eq('payment_id', payment.id)
         .order('ticket_number')
     : { data: [] }
