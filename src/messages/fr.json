@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "WinuCoin",
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "learnMore": "En savoir plus"
+  },
+  "nav": {
+    "home": "Accueil",
+    "competitions": "Compétitions",
+    "dashboard": "Tableau de bord",
+    "admin": "Admin",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "signIn": "Connexion",
+    "signInSubtitle": "Entrez votre email pour recevoir un code unique",
+    "email": "Adresse email",
+    "emailPlaceholder": "vous@exemple.com",
+    "sendCode": "Envoyer le code",
+    "sendingCode": "Envoi…",
+    "codeSent": "Vérifiez votre boîte — nous avons envoyé un code à 6 chiffres à",
+    "otpLabel": "Code unique",
+    "otpPlaceholder": "123456",
+    "verify": "Vérifier",
+    "verifying": "Vérification…",
+    "changeEmail": "Utiliser un autre email",
+    "noAccount": "Pas de compte ? Il sera créé automatiquement.",
+    "errors": {
+      "invalidEmail": "Veuillez entrer une adresse email valide",
+      "sendFailed": "Échec de l'envoi. Veuillez réessayer.",
+      "verifyFailed": "Code invalide ou expiré. Veuillez réessayer.",
+      "invalidOtp": "Veuillez entrer un code à 6 chiffres"
+    }
+  },
+  "landing": {
+    "heroTitle": "Gagnez du Crypto.",
+    "heroTitleAccent": "En toute transparence.",
+    "heroSubtitle": "Participez à des compétitions, achetez des tickets et gagnez de vraies cryptomonnaies — avec des tirages équitables et vérifiables.",
+    "cta": "Voir les compétitions",
+    "ctaSecondary": "Comment ça marche",
+    "howItWorks": "Comment ça marche",
+    "step1Title": "Choisissez une compétition",
+    "step1Desc": "Parcourez les compétitions en cours et choisissez le prix crypto qui vous intéresse.",
+    "step2Title": "Achetez vos tickets",
+    "step2Desc": "Achetez un ou plusieurs tickets de façon sécurisée par carte ou en crypto.",
+    "step3Title": "Gagnez du crypto",
+    "step3Desc": "Les gagnants sont tirés au sort de façon équitable. Le crypto est transféré instantanément.",
+    "currentCompetitions": "Compétitions en cours",
+    "noCompetitions": "Aucune compétition active pour le moment. Revenez bientôt."
+  },
+  "competitions": {
+    "title": "Compétitions",
+    "prize": "Prix",
+    "ticketPrice": "Prix du ticket",
+    "ticketsSold": "Tickets vendus",
+    "endsAt": "Se termine",
+    "buyTicket": "Acheter un ticket",
+    "soldOut": "Épuisé",
+    "ended": "Terminé",
+    "active": "Actif",
+    "back": "Retour aux compétitions"
+  },
+  "dashboard": {
+    "title": "Mon tableau de bord",
+    "myTickets": "Mes tickets",
+    "myPayments": "Mes paiements",
+    "noTickets": "Vous n'avez pas encore de tickets.",
+    "browseCompetitions": "Voir les compétitions"
+  },
+  "admin": {
+    "title": "Panneau d'administration",
+    "competitions": "Compétitions",
+    "users": "Utilisateurs",
+    "payments": "Paiements"
+  },
+  "footer": {
+    "tagline": "Gagnez du crypto, en toute transparence.",
+    "links": "Liens",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "copyright": "© {year} WinuCoin. Tous droits réservés."
+  }
+}

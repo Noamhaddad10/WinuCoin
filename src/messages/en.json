@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "WinuCoin",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "learnMore": "Learn more"
+  },
+  "nav": {
+    "home": "Home",
+    "competitions": "Competitions",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "login": "Sign In",
+    "logout": "Sign Out"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signInSubtitle": "Enter your email to receive a one-time code",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "sendCode": "Send Code",
+    "sendingCode": "Sending…",
+    "codeSent": "Check your inbox — we sent a 6-digit code to",
+    "otpLabel": "One-time code",
+    "otpPlaceholder": "123456",
+    "verify": "Verify",
+    "verifying": "Verifying…",
+    "changeEmail": "Use a different email",
+    "noAccount": "No account? One will be created automatically.",
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "sendFailed": "Failed to send code. Please try again.",
+      "verifyFailed": "Invalid or expired code. Please try again.",
+      "invalidOtp": "Please enter a 6-digit code"
+    }
+  },
+  "landing": {
+    "heroTitle": "Win Crypto.",
+    "heroTitleAccent": "Transparently.",
+    "heroSubtitle": "Enter competitions, buy tickets, and win real cryptocurrency prizes — powered by provably fair draws.",
+    "cta": "View Competitions",
+    "ctaSecondary": "How It Works",
+    "howItWorks": "How It Works",
+    "step1Title": "Choose a Competition",
+    "step1Desc": "Browse live competitions and pick a crypto prize that excites you.",
+    "step2Title": "Buy Your Tickets",
+    "step2Desc": "Purchase one or more tickets securely with your card or crypto.",
+    "step3Title": "Win Crypto",
+    "step3Desc": "Winners are drawn randomly and fairly. Crypto is transferred instantly.",
+    "currentCompetitions": "Current Competitions",
+    "noCompetitions": "No active competitions right now. Check back soon."
+  },
+  "competitions": {
+    "title": "Competitions",
+    "prize": "Prize",
+    "ticketPrice": "Ticket Price",
+    "ticketsSold": "Tickets Sold",
+    "endsAt": "Ends",
+    "buyTicket": "Buy Ticket",
+    "soldOut": "Sold Out",
+    "ended": "Ended",
+    "active": "Active",
+    "back": "Back to Competitions"
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "myTickets": "My Tickets",
+    "myPayments": "My Payments",
+    "noTickets": "You have no tickets yet.",
+    "browseCompetitions": "Browse Competitions"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "competitions": "Competitions",
+    "users": "Users",
+    "payments": "Payments"
+  },
+  "footer": {
+    "tagline": "Win crypto, transparently.",
+    "links": "Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© {year} WinuCoin. All rights reserved."
+  }
+}
