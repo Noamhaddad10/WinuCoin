@@ -80,8 +80,8 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="absolute bottom-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-300/10 blur-3xl dark:bg-indigo-500/5" />
           </div>
 
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
+          <div className="mx-auto max-w-5xl">
+            <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-10">
 
               {/* ── Text content ──────────────────────────────────────── */}
               <div className="flex-1 text-center lg:text-left">

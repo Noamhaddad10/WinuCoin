@@ -519,13 +519,21 @@ export function PhoneMockup() {
               // Titanium metallic gradient — works in light + dark
               background:
                 'linear-gradient(155deg, #5c5c6e 0%, #8e8ea0 18%, #c2c2d4 38%, #9a9aac 55%, #6a6a7c 75%, #46465a 100%)',
-              // Multi-layer shadow offset bottom-right (matches rotateY(-25deg) tilt)
+              // Soft depth shadows (bottom-right, matches rotateY(-25deg) tilt)
+              // + solid metallic layers simulating the visible right face of the phone body
               boxShadow: [
-                '3px 5px 12px rgba(0,0,0,0.14)',
-                '8px 16px 32px rgba(0,0,0,0.10)',
-                '18px 36px 64px rgba(0,0,0,0.07)',
-                'inset 0 1px 0 rgba(255,255,255,0.14)',
-                'inset 0 -1px 0 rgba(0,0,0,0.20)',
+                // Ambient / depth shadows
+                '3px 5px 12px rgba(0,0,0,0.18)',
+                '8px 16px 32px rgba(0,0,0,0.13)',
+                '18px 36px 64px rgba(0,0,0,0.09)',
+                // Solid edge layers — right face coming toward viewer (rotateY(-25deg))
+                // Each layer is 1px blur so it stays crisp and looks like a real edge face
+                '5px 3px 1px #3e3e52',
+                '9px 5px 1px #2e2e44',
+                '13px 7px 1px #20202e',
+                // Frame gloss lines
+                'inset 0 1px 0 rgba(255,255,255,0.16)',
+                'inset 0 -1px 0 rgba(0,0,0,0.22)',
               ].join(', '),
             }}
           >
