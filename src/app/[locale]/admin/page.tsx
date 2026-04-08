@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
-import { Users, Trophy, DollarSign, Ticket, Plus, Users2, CreditCard, Settings } from 'lucide-react'
+import { Users, Trophy, DollarSign, Ticket, Plus, Users2, CreditCard } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { StatsCard } from '@/components/ui/StatsCard'
 import { fmtUSD, fmtDate } from '@/lib/format'
-import { ThemeAnimationToggle } from '@/components/admin/ThemeAnimationToggle'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -102,27 +101,6 @@ export default async function AdminPage({ params }: AdminPageProps) {
             <CreditCard className="h-4 w-4" />
             {t('viewPayments')}
           </Link>
-        </div>
-      </div>
-
-      {/* Site Settings */}
-      <div className="mt-10">
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-          <Settings className="h-5 w-5 text-slate-400" />
-          Site Settings
-        </h2>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 last:border-0 dark:border-zinc-800">
-            <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                Sunrise / Sunset theme animation
-              </p>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                Immersive sky animation when toggling dark / light mode
-              </p>
-            </div>
-            <ThemeAnimationToggle />
-          </div>
         </div>
       </div>
 
