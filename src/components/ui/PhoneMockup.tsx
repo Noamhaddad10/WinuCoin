@@ -326,10 +326,20 @@ const slideVariants = {
 export function PhoneMockup() {
   const [screen, setScreen] = useState(0)
   const [direction, setDirection] = useState<1 | -1>(1)
+  // 1.6 on desktop, 1.3 on mobile
+  const [maxScale, setMaxScale] = useState(1.6)
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
   const phoneRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const confettiInstanceRef = useRef<any>(null)
+
+  /* responsive max zoom */
+  useEffect(() => {
+    const check = () => setMaxScale(window.innerWidth < 640 ? 1.3 : 1.6)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   /* initialise confetti bound to the fixed canvas once */
   useEffect(() => {
@@ -395,66 +405,103 @@ export function PhoneMockup() {
   const SCREENS = [Screen1, Screen2, Screen3]
   const CurrentScreen = SCREENS[screen]
 
+  // screen 0  → zoomed + clipped
+  // screen 1+ → full phone visible (overflow visible for confetti + shadows)
+  const isZoomed = screen === 0
+
   return (
-    <div ref={phoneRef} className="relative">
-      {/* Fixed full-viewport confetti canvas — overflows all containers */}
+    <div className="relative">
+      {/* Fixed full-viewport confetti canvas */}
       <canvas
         ref={confettiCanvasRef}
         className="pointer-events-none fixed inset-0 z-[9999]"
         style={{ width: '100vw', height: '100vh' }}
       />
 
-      {/* ── Phone frame ── */}
+      {/* ── Clip container ─────────────────────────────────────────────
+          Fixed 290 × 600 box. overflow:hidden while zoomed (screen 0)
+          so we only see the cropped upper area of the zoomed phone.
+          overflow:visible on screens 1-2 to show full frame + glow. */}
       <div
-        className="relative rounded-[44px] border-[5px] border-zinc-800 bg-zinc-900 p-[5px] dark:border-zinc-600"
         style={{
           width: 290,
-          boxShadow:
-            '0 40px 80px rgba(0,0,0,0.40), 0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04) inset',
+          height: 600,
+          position: 'relative',
+          overflow: isZoomed ? 'hidden' : 'visible',
         }}
       >
-        {/* Side volume buttons */}
-        <div className="pointer-events-none absolute -left-[7px] top-[100px] h-7 w-[5px] rounded-l-full bg-zinc-700" />
-        <div className="pointer-events-none absolute -left-[7px] top-[140px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
-        <div className="pointer-events-none absolute -left-[7px] top-[196px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
-        {/* Power button */}
-        <div className="pointer-events-none absolute -right-[7px] top-[130px] h-16 w-[5px] rounded-r-full bg-zinc-700" />
-
-        {/* Screen area */}
-        <div
-          className="relative overflow-hidden rounded-[38px] bg-white dark:bg-zinc-900"
-          style={{ height: 580 }}
+        {/* ── Scale motion div ─────────────────────────────────────────
+            Zoomed-in on screen 0 (cinematic close-up), full on 1 & 2.
+            transformOrigin at 50% 38% keeps the header area centred. */}
+        <motion.div
+          animate={{ scale: isZoomed ? maxScale : 1 }}
+          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+          style={{ transformOrigin: '50% 38%', width: 290 }}
         >
-          {/* Notch */}
-          <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-            <div className="h-6 w-28 rounded-b-[18px] bg-zinc-900" />
-          </div>
+          {/* ── 3D tilt — showcase / Apple-style presentation ────────── */}
+          <div
+            ref={phoneRef}
+            className="relative"
+            style={{
+              transform:
+                'perspective(1200px) rotateY(-15deg) rotateX(5deg) rotateZ(-2deg)',
+            }}
+          >
+            {/* Phone frame */}
+            <div
+              className="relative rounded-[44px] border-[5px] border-zinc-800 bg-zinc-900 p-[5px] dark:border-zinc-600"
+              style={{
+                width: 290,
+                // Shadow offset towards right/bottom to match the tilt direction
+                boxShadow:
+                  '22px 52px 80px rgba(0,0,0,0.45), 10px 22px 40px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.05) inset',
+              }}
+            >
+              {/* Side volume buttons */}
+              <div className="pointer-events-none absolute -left-[7px] top-[100px] h-7 w-[5px] rounded-l-full bg-zinc-700" />
+              <div className="pointer-events-none absolute -left-[7px] top-[140px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
+              <div className="pointer-events-none absolute -left-[7px] top-[196px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
+              {/* Power button */}
+              <div className="pointer-events-none absolute -right-[7px] top-[130px] h-16 w-[5px] rounded-r-full bg-zinc-700" />
 
-          {/* Animated screens */}
-          <div className="relative h-full overflow-hidden pt-6">
-            <AnimatePresence initial={false} mode="wait" custom={direction}>
-              <motion.div
-                key={screen}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute inset-0 pt-6"
+              {/* Screen area */}
+              <div
+                className="relative overflow-hidden rounded-[38px] bg-white dark:bg-zinc-900"
+                style={{ height: 580 }}
               >
-                <CurrentScreen />
-              </motion.div>
-            </AnimatePresence>
+                {/* Notch */}
+                <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
+                  <div className="h-6 w-28 rounded-b-[18px] bg-zinc-900" />
+                </div>
+
+                {/* Animated screens */}
+                <div className="relative h-full overflow-hidden pt-6">
+                  <AnimatePresence initial={false} mode="wait" custom={direction}>
+                    <motion.div
+                      key={screen}
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+                      className="absolute inset-0 pt-6"
+                    >
+                      <CurrentScreen />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Home indicator */}
+                <div className="absolute bottom-2 left-1/2 z-20 h-[3px] w-24 -translate-x-1/2 rounded-full bg-zinc-400/50 dark:bg-zinc-600/70" />
+              </div>
+            </div>
+
+            {/* Ambient glow — offset right to follow the tilt */}
+            <div className="pointer-events-none absolute -bottom-10 left-[60%] h-24 w-56 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-2xl dark:bg-indigo-600/35" />
           </div>
-
-          {/* Home indicator */}
-          <div className="absolute bottom-2 left-1/2 z-20 h-[3px] w-24 -translate-x-1/2 rounded-full bg-zinc-400/50 dark:bg-zinc-600/70" />
-        </div>
+        </motion.div>
       </div>
-
-      {/* Ambient glow under phone */}
-      <div className="pointer-events-none absolute -bottom-10 left-1/2 h-24 w-56 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-2xl dark:bg-indigo-600/30" />
     </div>
   )
 }
