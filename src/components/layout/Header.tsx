@@ -2,34 +2,12 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Sun, Moon, Home } from 'lucide-react'
+import { Menu, X, Home } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
-
-function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-
-  if (!mounted) return <div className="h-9 w-9" />
-
-  return (
-    <button
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      aria-label="Toggle theme"
-      className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-zinc-800 dark:hover:text-slate-200"
-    >
-      {resolvedTheme === 'dark' ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
-    </button>
-  )
-}
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 interface HeaderProps {
   locale: string
