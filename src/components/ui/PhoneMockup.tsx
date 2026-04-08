@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import { Search, ArrowLeft, Minus, Plus, Lock, Check } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
@@ -301,16 +301,50 @@ function Screen3() {
   )
 }
 
-/* ─── Shared status bar ──────────────────────────────────────────────────── */
+/* ─── Status bar — realistic iOS-style with SVG icons ────────────────────── */
 function StatusBar() {
   return (
-    <div className="flex items-center justify-between px-5 py-2 text-[10px] font-semibold text-zinc-400">
-      <span>9:41</span>
-      <span className="flex items-center gap-1">
-        <span>▲▲▲</span>
-        <span>WiFi</span>
-        <span>100%</span>
-      </span>
+    <div
+      className="relative z-10 flex items-center justify-between px-5 text-slate-900 dark:text-white"
+      style={{ paddingTop: 16, paddingBottom: 6 }}
+    >
+      {/* Time (left side — beside Dynamic Island) */}
+      <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '-0.3px' }}>9:41</span>
+
+      {/* Icons (right side — beside Dynamic Island) */}
+      <div className="flex items-center gap-[5px]">
+        {/* Signal bars */}
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <rect x="0" y="8" width="3" height="4" rx="0.7" fill="currentColor" />
+          <rect x="4.5" y="5.5" width="3" height="6.5" rx="0.7" fill="currentColor" />
+          <rect x="9" y="3" width="3" height="9" rx="0.7" fill="currentColor" />
+          <rect x="13.5" y="0" width="2.5" height="12" rx="0.7" fill="currentColor" fillOpacity={0.28} />
+        </svg>
+
+        {/* WiFi arcs */}
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="none">
+          <circle cx="7.5" cy="10.8" r="1.3" fill="currentColor" />
+          <path
+            d="M4.6 8.1C5.4 7.3 6.4 6.8 7.5 6.8s2.1.5 2.9 1.3"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+          />
+          <path
+            d="M1.8 5.3C3.4 3.7 5.3 2.8 7.5 2.8s4.1.9 5.7 2.5"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        {/* Battery — 80% charge */}
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+          <rect x="0.5" y="0.5" width="19" height="11" rx="2.5" stroke="currentColor" strokeWidth="1" />
+          <rect x="2" y="2" width="14.4" height="8" rx="1.5" fill="currentColor" />
+          <path d="M21 4v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </div>
     </div>
   )
 }
@@ -322,26 +356,68 @@ const slideVariants = {
   exit: (d: number) => ({ x: `${d * -100}%`, opacity: 0 }),
 }
 
+/* ─── Metallic button strip (reused for all 4 physical buttons) ──────────── */
+function PhysicalBtn({
+  style,
+}: {
+  style: React.CSSProperties
+}) {
+  return (
+    <div
+      className="pointer-events-none absolute"
+      style={{
+        background:
+          'linear-gradient(to right, #3c3c4e 0%, #7a7a8c 40%, #6a6a7c 70%, #4a4a5c 100%)',
+        ...style,
+      }}
+    />
+  )
+}
+
 /* ─── Main component ─────────────────────────────────────────────────────── */
 export function PhoneMockup() {
   const [screen, setScreen] = useState(0)
   const [direction, setDirection] = useState<1 | -1>(1)
-  // 1.6 on desktop, 1.3 on mobile
-  const [maxScale, setMaxScale] = useState(1.6)
+  const phoneControls = useAnimation()
+  const glowControls = useAnimation()
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
   const phoneRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const confettiInstanceRef = useRef<any>(null)
 
-  /* responsive max zoom */
+  /* ── One-time rise animation — only on first mount ───────────────────── */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const check = () => setMaxScale(window.innerWidth < 640 ? 1.3 : 1.6)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
+    const mobile = window.innerWidth < 640
+    const startRX = mobile ? 50 : 70
+    const startTY = mobile ? 30 : 60
 
-  /* initialise confetti bound to the fixed canvas once */
+    // Snap instantly to "phone lying flat" position + glow visible
+    phoneControls.set({
+      rotateX: startRX,
+      rotateY: -30,
+      rotateZ: -5,
+      y: startTY,
+    })
+    glowControls.set({ opacity: 1 })
+
+    // Next frame: begin the rise
+    requestAnimationFrame(() => {
+      phoneControls.start({
+        rotateX: 15,
+        rotateY: -25,
+        rotateZ: -3,
+        y: 0,
+        transition: { duration: 3, ease: [0.16, 1, 0.3, 1] },
+      })
+      glowControls.start({
+        opacity: 0,
+        transition: { duration: 2.5, ease: [0.4, 0, 0.2, 1] },
+      })
+    })
+  }, []) // empty deps → runs once, never again on screen changes
+
+  /* ── Confetti instance (init once) ──────────────────────────────────── */
   useEffect(() => {
     if (!confettiCanvasRef.current) return
     confettiInstanceRef.current = confetti.create(confettiCanvasRef.current, {
@@ -351,7 +427,7 @@ export function PhoneMockup() {
     return () => confettiInstanceRef.current?.reset()
   }, [])
 
-  /* auto-advance */
+  /* ── Auto-advance screens ────────────────────────────────────────────── */
   useEffect(() => {
     const t = setInterval(() => {
       setDirection(1)
@@ -360,7 +436,7 @@ export function PhoneMockup() {
     return () => clearInterval(t)
   }, [])
 
-  /* confetti burst when screen 3 appears */
+  /* ── Confetti burst when screen 3 appears ───────────────────────────── */
   useEffect(() => {
     if (screen !== 2) return
     if (!confettiInstanceRef.current || !phoneRef.current) return
@@ -405,10 +481,6 @@ export function PhoneMockup() {
   const SCREENS = [Screen1, Screen2, Screen3]
   const CurrentScreen = SCREENS[screen]
 
-  // screen 0  → zoomed + clipped
-  // screen 1+ → full phone visible (overflow visible for confetti + shadows)
-  const isZoomed = screen === 0
-
   return (
     <div className="relative">
       {/* Fixed full-viewport confetti canvas */}
@@ -418,64 +490,95 @@ export function PhoneMockup() {
         style={{ width: '100vw', height: '100vh' }}
       />
 
-      {/* ── Clip container ─────────────────────────────────────────────
-          Fixed 290 × 600 box. overflow:hidden while zoomed (screen 0)
-          so we only see the cropped upper area of the zoomed phone.
-          overflow:visible on screens 1-2 to show full frame + glow. */}
-      <div
-        style={{
-          width: 290,
-          height: 600,
-          position: 'relative',
-          overflow: isZoomed ? 'hidden' : 'visible',
-        }}
-      >
-        {/* ── Scale motion div ─────────────────────────────────────────
-            Zoomed-in on screen 0 (cinematic close-up), full on 1 & 2.
-            transformOrigin at 50% 38% keeps the header area centred. */}
+      {/* ── Perspective parent (1000px gives natural-looking 3D) ────────── */}
+      <div style={{ perspective: '1000px' }}>
+
+        {/* ── Phone — animated rise on mount, then static ─────────────── */}
         <motion.div
-          animate={{ scale: isZoomed ? maxScale : 1 }}
-          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
-          style={{ transformOrigin: '50% 38%', width: 290 }}
+          ref={phoneRef}
+          animate={phoneControls}
+          className="relative"
+          style={{ width: 290 }}
         >
-          {/* ── 3D tilt — showcase / Apple-style presentation ────────── */}
-          <div
-            ref={phoneRef}
-            className="relative"
+          {/* Screen glow — simulates lying-flat screen light, fades on rise */}
+          <motion.div
+            animate={glowControls}
+            className="pointer-events-none absolute -inset-6 rounded-[60px]"
             style={{
-              transform:
-                'perspective(1200px) rotateY(-15deg) rotateX(5deg) rotateZ(-2deg)',
+              boxShadow: '0 0 80px 20px rgba(139, 92, 246, 0.35)',
+              filter: 'blur(6px)',
+            }}
+          />
+
+          {/* ── iPhone 15 Pro style chassis ─────────────────────────────── */}
+          <div
+            style={{
+              width: 290,
+              borderRadius: 44,
+              padding: 3,
+              // Titanium metallic gradient — works in light + dark
+              background:
+                'linear-gradient(155deg, #5c5c6e 0%, #8e8ea0 18%, #c2c2d4 38%, #9a9aac 55%, #6a6a7c 75%, #46465a 100%)',
+              // Multi-layer shadow offset bottom-right (matches rotateY(-25deg) tilt)
+              boxShadow: [
+                '3px 5px 12px rgba(0,0,0,0.14)',
+                '8px 16px 32px rgba(0,0,0,0.10)',
+                '18px 36px 64px rgba(0,0,0,0.07)',
+                'inset 0 1px 0 rgba(255,255,255,0.14)',
+                'inset 0 -1px 0 rgba(0,0,0,0.20)',
+              ].join(', '),
             }}
           >
-            {/* Phone frame */}
+            {/* Dark hairline gap between chassis and glass */}
             <div
-              className="relative rounded-[44px] border-[5px] border-zinc-800 bg-zinc-900 p-[5px] dark:border-zinc-600"
               style={{
-                width: 290,
-                // Shadow offset towards right/bottom to match the tilt direction
-                boxShadow:
-                  '22px 52px 80px rgba(0,0,0,0.45), 10px 22px 40px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.05) inset',
+                borderRadius: 41,
+                background: '#080808',
+                padding: 2,
               }}
             >
-              {/* Side volume buttons */}
-              <div className="pointer-events-none absolute -left-[7px] top-[100px] h-7 w-[5px] rounded-l-full bg-zinc-700" />
-              <div className="pointer-events-none absolute -left-[7px] top-[140px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
-              <div className="pointer-events-none absolute -left-[7px] top-[196px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
-              {/* Power button */}
-              <div className="pointer-events-none absolute -right-[7px] top-[130px] h-16 w-[5px] rounded-r-full bg-zinc-700" />
-
-              {/* Screen area */}
+              {/* ── Screen glass ─────────────────────────────────────────── */}
               <div
-                className="relative overflow-hidden rounded-[38px] bg-white dark:bg-zinc-900"
-                style={{ height: 580 }}
+                className="relative overflow-hidden bg-white dark:bg-zinc-900"
+                style={{ borderRadius: 39, height: 580 }}
               >
-                {/* Notch */}
-                <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-                  <div className="h-6 w-28 rounded-b-[18px] bg-zinc-900" />
+                {/* Glass diagonal reflection */}
+                <div
+                  className="pointer-events-none absolute inset-0 z-30"
+                  style={{
+                    borderRadius: 39,
+                    background:
+                      'linear-gradient(138deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 45%, transparent 68%)',
+                  }}
+                />
+
+                {/* Dynamic Island pill */}
+                <div
+                  className="absolute z-20 flex items-center justify-end"
+                  style={{
+                    left: '50%',
+                    top: 11,
+                    transform: 'translateX(-50%)',
+                    width: 92,
+                    height: 26,
+                    borderRadius: 999,
+                    background: '#000',
+                    paddingRight: 11,
+                  }}
+                >
+                  {/* Front camera dot */}
+                  <div
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#1c1c1c',
+                    }}
+                  />
                 </div>
 
-                {/* Animated screens */}
-                <div className="relative h-full overflow-hidden pt-6">
+                {/* Animated screen content */}
+                <div className="relative h-full overflow-hidden">
                   <AnimatePresence initial={false} mode="wait" custom={direction}>
                     <motion.div
                       key={screen}
@@ -485,21 +588,81 @@ export function PhoneMockup() {
                       animate="center"
                       exit="exit"
                       transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
-                      className="absolute inset-0 pt-6"
+                      className="absolute inset-0"
                     >
                       <CurrentScreen />
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
-                {/* Home indicator */}
-                <div className="absolute bottom-2 left-1/2 z-20 h-[3px] w-24 -translate-x-1/2 rounded-full bg-zinc-400/50 dark:bg-zinc-600/70" />
+                {/* Home bar (iOS-style pill) */}
+                <div
+                  className="absolute bottom-[7px] left-1/2 z-20 -translate-x-1/2 rounded-full"
+                  style={{
+                    width: 112,
+                    height: 4,
+                    background: 'rgba(0,0,0,0.22)',
+                  }}
+                />
               </div>
             </div>
-
-            {/* Ambient glow — offset right to follow the tilt */}
-            <div className="pointer-events-none absolute -bottom-10 left-[60%] h-24 w-56 -translate-x-1/2 rounded-full bg-indigo-500/25 blur-2xl dark:bg-indigo-600/35" />
           </div>
+
+          {/* ── Physical buttons ─────────────────────────────────────────── */}
+          {/* Mute / silent switch (left, top) */}
+          <PhysicalBtn
+            style={{
+              left: -3,
+              top: 84,
+              width: 3,
+              height: 20,
+              borderRadius: '2px 0 0 2px',
+            }}
+          />
+          {/* Volume up (left) */}
+          <PhysicalBtn
+            style={{
+              left: -3,
+              top: 120,
+              width: 3,
+              height: 32,
+              borderRadius: '2px 0 0 2px',
+            }}
+          />
+          {/* Volume down (left) */}
+          <PhysicalBtn
+            style={{
+              left: -3,
+              top: 164,
+              width: 3,
+              height: 32,
+              borderRadius: '2px 0 0 2px',
+            }}
+          />
+          {/* Power button (right) */}
+          <PhysicalBtn
+            style={{
+              right: -3,
+              top: 128,
+              width: 3,
+              height: 42,
+              borderRadius: '0 2px 2px 0',
+              background:
+                'linear-gradient(to left, #3c3c4e 0%, #7a7a8c 40%, #6a6a7c 70%, #4a4a5c 100%)',
+            }}
+          />
+
+          {/* Ambient glow — offset right to follow tilt direction */}
+          <div
+            className="pointer-events-none absolute rounded-full bg-indigo-500/20 blur-2xl dark:bg-indigo-600/30"
+            style={{
+              bottom: -44,
+              left: '62%',
+              transform: 'translateX(-50%)',
+              width: 220,
+              height: 88,
+            }}
+          />
         </motion.div>
       </div>
     </div>
