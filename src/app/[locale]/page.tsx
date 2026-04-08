@@ -80,11 +80,11 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="absolute bottom-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-300/10 blur-3xl dark:bg-indigo-500/5" />
           </div>
 
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-10">
 
               {/* ── Text content ──────────────────────────────────────── */}
-              <div className="flex-1 text-center lg:text-left">
+              <div className="flex-1 pl-0 text-center lg:pl-8 lg:text-left">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-950/50 dark:text-indigo-300">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
@@ -92,14 +92,14 @@ export default async function HomePage({ params }: HomePageProps) {
                 </div>
 
                 {/* Headline */}
-                <h1 className="mt-6 text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-6xl">
+                <h1 className="mt-6 text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-6xl lg:text-7xl">
                   {t('heroTitle')}{' '}
                   <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                     {t('heroTitleAccent')}
                   </span>
                 </h1>
 
-                <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-slate-400 lg:mx-0">
+                <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-slate-400 lg:mx-0 lg:text-xl">
                   {t('heroSubtitle')}
                 </p>
 
