@@ -80,39 +80,51 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="absolute bottom-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-300/10 blur-3xl dark:bg-indigo-500/5" />
           </div>
 
-          <div className="mx-auto max-w-4xl text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-950/50 dark:text-indigo-300">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
-              {t('heroBadge')}
-            </div>
+          <div className="mx-auto max-w-7xl">
+            <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
 
-            {/* Headline */}
-            <h1 className="mt-6 text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-7xl">
-              {t('heroTitle')}{' '}
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {t('heroTitleAccent')}
-              </span>
-            </h1>
+              {/* ── Text content ──────────────────────────────────────── */}
+              <div className="flex-1 text-center lg:text-left">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-950/50 dark:text-indigo-300">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
+                  {t('heroBadge')}
+                </div>
 
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-              {t('heroSubtitle')}
-            </p>
+                {/* Headline */}
+                <h1 className="mt-6 text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-6xl">
+                  {t('heroTitle')}{' '}
+                  <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    {t('heroTitleAccent')}
+                  </span>
+                </h1>
 
-            {/* CTAs */}
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href={`/${locale}/competitions`}
-                className="inline-flex h-13 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/30"
-              >
-                {t('cta')}
-              </Link>
-              <a
-                href="#how-it-works"
-                className="inline-flex h-13 items-center justify-center rounded-xl border border-slate-200 bg-white px-8 py-3.5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:text-slate-300 dark:hover:bg-zinc-800"
-              >
-                {t('ctaSecondary')}
-              </a>
+                <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-slate-400 lg:mx-0">
+                  {t('heroSubtitle')}
+                </p>
+
+                {/* CTAs */}
+                <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
+                  <Link
+                    href={`/${locale}/competitions`}
+                    className="inline-flex h-13 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/30"
+                  >
+                    {t('cta')}
+                  </Link>
+                  <a
+                    href="#how-it-works"
+                    className="inline-flex h-13 items-center justify-center rounded-xl border border-slate-200 bg-white px-8 py-3.5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:text-slate-300 dark:hover:bg-zinc-800"
+                  >
+                    {t('ctaSecondary')}
+                  </a>
+                </div>
+              </div>
+
+              {/* ── Phone mockup ──────────────────────────────────────── */}
+              <div className="shrink-0">
+                <PhoneMockup />
+              </div>
+
             </div>
           </div>
         </section>
@@ -135,9 +147,6 @@ export default async function HomePage({ params }: HomePageProps) {
             ))}
           </div>
         </div>
-
-        {/* ── Phone Mockup / How it works ───────────────────────────────── */}
-        <PhoneMockup locale={locale} />
 
         {/* ── Live Competitions ──────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-slate-50 px-4 py-24 dark:bg-zinc-950 sm:px-6 lg:px-8">

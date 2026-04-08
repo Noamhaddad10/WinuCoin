@@ -2,416 +2,459 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Trophy, Ticket, Zap, CreditCard, CheckCircle } from 'lucide-react'
-import Link from 'next/link'
+import { Search, ArrowLeft, Minus, Plus, Lock, Check } from 'lucide-react'
+import confetti from 'canvas-confetti'
 
-/* ─── Individual screen content ─────────────────────────────────────────── */
+const SCREEN_DURATION = 5000
 
+/* ─── Stagger helper ─────────────────────────────────────────────────────── */
+const sg = (i: number) => ({
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0 },
+  transition: {
+    delay: 0.06 + i * 0.11,
+    duration: 0.32,
+    ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  },
+})
+
+/* ─── Screen 1 — Browse competitions ────────────────────────────────────── */
 function Screen1() {
+  const cards = [
+    {
+      symbol: '₿',
+      bg: 'bg-orange-500',
+      name: 'Win 1 BTC',
+      prize: '$60,000',
+      sold: 45,
+      total: 100,
+      price: '$50',
+    },
+    {
+      symbol: 'Ξ',
+      bg: 'bg-indigo-500',
+      name: 'Win 0.5 ETH',
+      prize: '$1,800',
+      sold: 23,
+      total: 80,
+      price: '$25',
+    },
+  ]
+
   return (
-    <div className="flex h-full flex-col bg-slate-50 dark:bg-zinc-900">
+    <div className="flex h-full flex-col bg-white dark:bg-zinc-900">
       {/* Status bar */}
-      <div className="flex items-center justify-between px-5 pt-2 text-[10px] font-semibold text-slate-400 dark:text-zinc-500">
-        <span>9:41</span>
-        <span>●●●</span>
-      </div>
+      <StatusBar />
 
-      {/* Header icon */}
-      <div className="mt-4 flex flex-col items-center gap-1 px-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
-          <Trophy className="h-6 w-6 text-white" />
+      {/* Header */}
+      <motion.div {...sg(0)} className="flex items-center justify-between px-4 pb-3">
+        <span className="text-base font-bold text-slate-900 dark:text-white">Competitions</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800">
+          <Search className="h-3.5 w-3.5 text-slate-500 dark:text-zinc-400" />
         </div>
-        <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-slate-50">
-          Choose a competition
-        </h3>
-        <p className="text-center text-[10px] leading-tight text-slate-500 dark:text-zinc-400">
-          Browse live competitions and pick a crypto prize
-        </p>
-      </div>
+      </motion.div>
 
-      {/* Fake competition cards */}
-      <div className="mt-4 flex flex-col gap-2 px-3">
-        {[
-          { coin: 'BTC', name: 'Bitcoin Winner', prize: '$1,000', pct: 68, ticketPrice: '$20', grad: 'from-amber-500 to-orange-500' },
-          { coin: 'ETH', name: 'Ethereum Drop', prize: '$500', pct: 35, ticketPrice: '$10', grad: 'from-indigo-500 to-purple-600' },
-        ].map((c) => (
-          <div
-            key={c.coin}
-            className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
-          >
-            <div className={`rounded-t-xl bg-gradient-to-r ${c.grad} px-3 py-2`}>
-              <div className="flex items-center justify-between">
-                <span className="rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[9px] font-bold text-white">
-                  {c.coin}
-                </span>
-                <span className="text-xs font-bold text-white">{c.prize}</span>
-              </div>
-            </div>
-            <div className="px-3 py-2">
-              <p className="text-[10px] font-semibold text-slate-800 dark:text-slate-100">{c.name}</p>
-              <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-700">
+      {/* Cards */}
+      <div className="flex flex-col gap-3 px-3">
+        {cards.map((card, i) => {
+          const pct = Math.round((card.sold / card.total) * 100)
+          return (
+            <motion.div
+              key={card.symbol}
+              {...sg(i + 1)}
+              className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
+            >
+              <div className="flex items-start gap-3 p-3">
                 <div
-                  className={`h-full rounded-full bg-gradient-to-r ${c.grad}`}
-                  style={{ width: `${c.pct}%` }}
-                />
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${card.bg} font-black text-white shadow-sm`}
+                >
+                  {card.symbol}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                      {card.name}
+                    </span>
+                    <span className="flex items-center gap-1 text-[9px] font-bold text-green-500">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
+                      LIVE
+                    </span>
+                  </div>
+                  <span className="text-base font-extrabold text-indigo-600 dark:text-indigo-400">
+                    {card.prize}
+                  </span>
+                  <div className="mt-2">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-700">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <div className="mt-1 flex justify-between text-[9px] text-slate-400">
+                      <span>
+                        {card.sold}/{card.total} tickets
+                      </span>
+                      <span className="font-semibold text-slate-600 dark:text-zinc-300">
+                        {card.price}/ticket
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="mt-1 flex items-center justify-between">
-                <span className="text-[9px] text-slate-400">{c.pct}% sold</span>
-                <span className="text-[9px] font-semibold text-slate-600 dark:text-slate-300">
-                  Ticket {c.ticketPrice}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+              <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-2 text-xs font-bold text-white">
+                Enter Now →
+              </button>
+            </motion.div>
+          )
+        })}
       </div>
     </div>
   )
 }
 
+/* ─── Screen 2 — Purchase tickets ───────────────────────────────────────── */
 function Screen2() {
   return (
-    <div className="flex h-full flex-col bg-slate-50 dark:bg-zinc-900">
-      {/* Status bar */}
-      <div className="flex items-center justify-between px-5 pt-2 text-[10px] font-semibold text-slate-400 dark:text-zinc-500">
-        <span>9:41</span>
-        <span>●●●</span>
-      </div>
+    <div className="flex h-full flex-col bg-white dark:bg-zinc-900">
+      <StatusBar />
 
-      {/* Header icon */}
-      <div className="mt-4 flex flex-col items-center gap-1 px-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg shadow-violet-500/30">
-          <Ticket className="h-6 w-6 text-white" />
+      {/* Back header */}
+      <motion.div {...sg(0)} className="flex items-center gap-2 px-4 pb-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800">
+          <ArrowLeft className="h-3.5 w-3.5 text-slate-600 dark:text-zinc-300" />
         </div>
-        <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-slate-50">
-          Buy your tickets
-        </h3>
-        <p className="text-center text-[10px] leading-tight text-slate-500 dark:text-zinc-400">
-          Pay securely with your card via Stripe
-        </p>
-      </div>
+        <span className="text-base font-bold text-slate-900 dark:text-white">Purchase tickets</span>
+      </motion.div>
 
-      {/* Order summary */}
-      <div className="mx-3 mt-4 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
-        <div className="border-b border-slate-100 px-4 py-2.5 dark:border-zinc-700">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-400">
-            Order Summary
-          </p>
-        </div>
-        <div className="px-4 py-3 text-[11px]">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-600 dark:text-zinc-300">Bitcoin Winner</span>
-            <span className="font-semibold text-slate-900 dark:text-slate-50">$1,000</span>
+      <div className="flex flex-col gap-2 px-3">
+        {/* Competition */}
+        <motion.div
+          {...sg(1)}
+          className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-zinc-700 dark:bg-zinc-800"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500 font-black text-white">
+            ₿
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-slate-500 dark:text-zinc-400">Tickets</span>
-            <span className="rounded bg-indigo-50 px-2 py-0.5 font-bold text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
-              × 3
+          <div>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">Win 1 BTC</p>
+            <p className="text-xs text-slate-500 dark:text-zinc-400">Prize pool: $60,000</p>
+          </div>
+        </motion.div>
+
+        {/* Ticket price */}
+        <motion.div
+          {...sg(2)}
+          className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60"
+        >
+          <span className="text-sm text-slate-600 dark:text-zinc-300">Ticket price</span>
+          <span className="text-sm font-bold text-slate-900 dark:text-white">$50</span>
+        </motion.div>
+
+        {/* Quantity */}
+        <motion.div
+          {...sg(3)}
+          className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60"
+        >
+          <span className="text-sm text-slate-600 dark:text-zinc-300">Quantity</span>
+          <div className="flex items-center gap-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-700">
+              <Minus className="h-3 w-3 text-slate-500" />
+            </div>
+            <span className="w-4 text-center text-sm font-bold text-slate-900 dark:text-white">
+              2
             </span>
-          </div>
-          <div className="mt-2 border-t border-dashed border-slate-100 pt-2 dark:border-zinc-700">
-            <div className="flex items-center justify-between font-semibold">
-              <span className="text-slate-700 dark:text-zinc-200">Total</span>
-              <span className="text-slate-900 dark:text-slate-50">$60.00</span>
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-950/60">
+              <Plus className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Powered by Stripe note */}
-      <div className="mx-3 mt-2 flex items-center gap-1.5">
-        <CreditCard className="h-3 w-3 text-slate-400" />
-        <span className="text-[9px] text-slate-400 dark:text-zinc-500">Powered by Stripe · Encrypted</span>
-      </div>
+        {/* Total */}
+        <motion.div
+          {...sg(4)}
+          className="flex items-center justify-between border-t border-slate-100 px-1 pt-3 dark:border-zinc-700"
+        >
+          <span className="text-sm font-semibold text-slate-600 dark:text-zinc-300">Total</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white">$100</span>
+        </motion.div>
 
-      {/* Pay button */}
-      <div className="mx-3 mt-3">
-        <div className="flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/25">
-          Pay now →
-        </div>
+        {/* Pay button */}
+        <motion.button
+          {...sg(5)}
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/30"
+        >
+          <Lock className="h-4 w-4" />
+          Pay with Stripe
+        </motion.button>
+
+        {/* Card logos */}
+        <motion.div {...sg(6)} className="flex items-center justify-center gap-2">
+          {['VISA', 'Mastercard', 'PayPal'].map((brand) => (
+            <span
+              key={brand}
+              className="rounded border border-slate-200 px-2 py-0.5 text-[9px] font-bold text-slate-400 dark:border-zinc-600 dark:text-zinc-500"
+            >
+              {brand}
+            </span>
+          ))}
+        </motion.div>
       </div>
     </div>
   )
 }
 
+/* ─── Screen 3 — Win! ────────────────────────────────────────────────────── */
 function Screen3() {
   return (
-    <div className="flex h-full flex-col items-center bg-slate-50 dark:bg-zinc-900">
-      {/* Status bar */}
-      <div className="flex w-full items-center justify-between px-5 pt-2 text-[10px] font-semibold text-slate-400 dark:text-zinc-500">
-        <span>9:41</span>
-        <span>●●●</span>
-      </div>
+    <div className="flex h-full flex-col items-center bg-white dark:bg-zinc-900">
+      <StatusBar />
 
-      {/* Celebration icon with glow pulse */}
-      <div className="relative mt-6 flex flex-col items-center">
-        <div className="absolute h-20 w-20 animate-ping rounded-full bg-amber-400/20" />
-        <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-xl shadow-amber-400/40">
-          <Zap className="h-7 w-7 text-white" />
+      {/* Animated checkmark */}
+      <motion.div
+        initial={{ scale: 0, rotate: -20 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 14 }}
+        className="relative mt-4 flex h-20 w-20 items-center justify-center"
+      >
+        <motion.div
+          animate={{ scale: [1, 1.35, 1] }}
+          transition={{ delay: 0.5, duration: 1, repeat: Infinity, repeatDelay: 1.5 }}
+          className="absolute h-20 w-20 rounded-full bg-green-400/20"
+        />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 shadow-xl shadow-green-400/40">
+          <motion.svg viewBox="0 0 24 24" className="h-9 w-9" fill="none">
+            <motion.path
+              d="M5 13l4 4L19 7"
+              stroke="white"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 0.45, duration: 0.5 }}
+            />
+          </motion.svg>
         </div>
-      </div>
+      </motion.div>
 
-      <h3 className="mt-4 text-base font-extrabold text-slate-900 dark:text-slate-50">
-        You won! 🎉
-      </h3>
-      <p className="mt-1 text-center text-[10px] leading-tight text-slate-500 dark:text-zinc-400 px-6">
-        Crypto is sent to your wallet instantly
-      </p>
+      {/* Congratulations */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.38 }}
+        className="mt-4 text-lg font-extrabold text-slate-900 dark:text-white"
+      >
+        Congratulations!
+      </motion.p>
 
-      {/* Win card */}
-      <div className="mx-3 mt-5 w-[calc(100%-1.5rem)] rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-orange-600 p-4 shadow-xl shadow-orange-500/30">
-        <p className="text-[9px] font-semibold uppercase tracking-wider text-white/70">
-          Congratulations!
+      {/* Amount with glow pulse */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.52, type: 'spring', stiffness: 160 }}
+        className="mt-2 text-center"
+      >
+        <motion.p
+          animate={{
+            textShadow: [
+              '0 0 0px rgba(99,102,241,0)',
+              '0 0 24px rgba(99,102,241,0.7)',
+              '0 0 0px rgba(99,102,241,0)',
+            ],
+          }}
+          transition={{ delay: 1, duration: 1.8, repeat: Infinity, repeatDelay: 0.8 }}
+          className="text-3xl font-black text-slate-900 dark:text-white"
+        >
+          You won 1 BTC
+        </motion.p>
+        <p className="text-sm text-slate-400 dark:text-zinc-400">≈ $60,000</p>
+      </motion.div>
+
+      {/* Sent badge */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.68 }}
+        className="mt-4 flex items-center gap-2 rounded-full bg-green-50 px-5 py-2 dark:bg-green-950/40"
+      >
+        <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+        <span className="text-sm font-semibold text-green-700 dark:text-green-400">
+          Sent to your wallet ✓
+        </span>
+      </motion.div>
+
+      {/* Transaction hash */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.82 }}
+        className="mx-3 mt-5 w-[calc(100%-1.5rem)] rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-800"
+      >
+        <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+          Transaction hash
         </p>
-        <p className="mt-1 text-xl font-black text-white">0.01 BTC</p>
-        <p className="text-[10px] text-white/80">Bitcoin Winner · Ticket #142</p>
-        <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-white/15 px-3 py-1.5 backdrop-blur-sm">
-          <CheckCircle className="h-3 w-3 text-green-300" />
-          <span className="text-[10px] font-semibold text-white">Sent to wallet</span>
-          <span className="ml-auto text-[9px] text-green-300">● Confirmed</span>
-        </div>
-      </div>
-
-      {/* Confetti dots decoration */}
-      <div className="mt-4 flex gap-2">
-        {['bg-indigo-400', 'bg-amber-400', 'bg-purple-400', 'bg-green-400', 'bg-orange-400'].map(
-          (c, i) => (
-            <div key={i} className={`h-2 w-2 rounded-full ${c} opacity-70`} />
-          ),
-        )}
-      </div>
+        <p className="mt-0.5 truncate font-mono text-[10px] text-slate-600 dark:text-zinc-300">
+          0x7f3a9b2c4e1d5678...8b2c
+        </p>
+      </motion.div>
     </div>
   )
 }
 
-/* ─── Screens config ─────────────────────────────────────────────────────── */
-
-const SCREENS = [
-  { id: 0, label: 'Browse', Content: Screen1 },
-  { id: 1, label: 'Buy',    Content: Screen2 },
-  { id: 2, label: 'Win',    Content: Screen3 },
-]
-
-const INTERVAL_MS = 4000
+/* ─── Shared status bar ──────────────────────────────────────────────────── */
+function StatusBar() {
+  return (
+    <div className="flex items-center justify-between px-5 py-2 text-[10px] font-semibold text-zinc-400">
+      <span>9:41</span>
+      <span className="flex items-center gap-1">
+        <span>▲▲▲</span>
+        <span>WiFi</span>
+        <span>100%</span>
+      </span>
+    </div>
+  )
+}
 
 /* ─── Slide variants ─────────────────────────────────────────────────────── */
-
-function buildVariants(direction: 1 | -1) {
-  return {
-    enter:  { x: direction * 100, opacity: 0 },
-    center: { x: 0, opacity: 1 },
-    exit:   { x: direction * -100, opacity: 0 },
-  }
+const slideVariants = {
+  enter: (d: number) => ({ x: `${d * 100}%`, opacity: 0 }),
+  center: { x: '0%', opacity: 1 },
+  exit: (d: number) => ({ x: `${d * -100}%`, opacity: 0 }),
 }
 
-/* ─── Phone shell ─────────────────────────────────────────────────────────── */
+/* ─── Main component ─────────────────────────────────────────────────────── */
+export function PhoneMockup() {
+  const [screen, setScreen] = useState(0)
+  const [direction, setDirection] = useState<1 | -1>(1)
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
+  const phoneRef = useRef<HTMLDivElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const confettiInstanceRef = useRef<any>(null)
 
-function PhoneShell({ children }: { children: React.ReactNode }) {
+  /* initialise confetti bound to the fixed canvas once */
+  useEffect(() => {
+    if (!confettiCanvasRef.current) return
+    confettiInstanceRef.current = confetti.create(confettiCanvasRef.current, {
+      resize: true,
+      useWorker: false,
+    })
+    return () => confettiInstanceRef.current?.reset()
+  }, [])
+
+  /* auto-advance */
+  useEffect(() => {
+    const t = setInterval(() => {
+      setDirection(1)
+      setScreen((s) => (s + 1) % 3)
+    }, SCREEN_DURATION)
+    return () => clearInterval(t)
+  }, [])
+
+  /* confetti burst when screen 3 appears */
+  useEffect(() => {
+    if (screen !== 2) return
+    if (!confettiInstanceRef.current || !phoneRef.current) return
+
+    const fire = confettiInstanceRef.current
+    const rect = phoneRef.current.getBoundingClientRect()
+    const ox = (rect.left + rect.width / 2) / window.innerWidth
+    const oy = (rect.top + rect.height / 2) / window.innerHeight
+
+    const t1 = setTimeout(() => {
+      fire({
+        particleCount: 110,
+        spread: 95,
+        origin: { x: ox, y: oy },
+        colors: ['#fbbf24', '#a78bfa', '#34d399', '#ffffff', '#f59e0b'],
+        startVelocity: 48,
+        gravity: 0.9,
+        ticks: 220,
+        zIndex: 9999,
+      })
+    }, 300)
+
+    const t2 = setTimeout(() => {
+      fire({
+        particleCount: 65,
+        spread: 135,
+        origin: { x: ox, y: oy },
+        colors: ['#6366f1', '#ec4899', '#10b981', '#fbbf24'],
+        startVelocity: 34,
+        gravity: 0.8,
+        ticks: 180,
+        zIndex: 9999,
+      })
+    }, 580)
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
+  }, [screen])
+
+  const SCREENS = [Screen1, Screen2, Screen3]
+  const CurrentScreen = SCREENS[screen]
+
   return (
-    <div
-      className="relative mx-auto w-52 sm:w-60"
-      style={{ filter: 'drop-shadow(0 32px 48px rgba(0,0,0,0.25))' }}
-    >
-      {/* Outer bezel */}
-      <div className="relative rounded-[2.8rem] border-4 border-zinc-800 bg-zinc-900 p-2 dark:border-zinc-700">
-        {/* Side buttons (decorative) */}
-        <div className="pointer-events-none absolute -right-2 top-24 h-14 w-1 rounded-r-full bg-zinc-700" />
-        <div className="pointer-events-none absolute -left-2 top-20 h-10 w-1 rounded-l-full bg-zinc-700" />
-        <div className="pointer-events-none absolute -left-2 top-34 h-10 w-1 rounded-l-full bg-zinc-700" />
+    <div ref={phoneRef} className="relative">
+      {/* Fixed full-viewport confetti canvas — overflows all containers */}
+      <canvas
+        ref={confettiCanvasRef}
+        className="pointer-events-none fixed inset-0 z-[9999]"
+        style={{ width: '100vw', height: '100vh' }}
+      />
+
+      {/* ── Phone frame ── */}
+      <div
+        className="relative rounded-[44px] border-[5px] border-zinc-800 bg-zinc-900 p-[5px] dark:border-zinc-600"
+        style={{
+          width: 290,
+          boxShadow:
+            '0 40px 80px rgba(0,0,0,0.40), 0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04) inset',
+        }}
+      >
+        {/* Side volume buttons */}
+        <div className="pointer-events-none absolute -left-[7px] top-[100px] h-7 w-[5px] rounded-l-full bg-zinc-700" />
+        <div className="pointer-events-none absolute -left-[7px] top-[140px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
+        <div className="pointer-events-none absolute -left-[7px] top-[196px] h-12 w-[5px] rounded-l-full bg-zinc-700" />
+        {/* Power button */}
+        <div className="pointer-events-none absolute -right-[7px] top-[130px] h-16 w-[5px] rounded-r-full bg-zinc-700" />
 
         {/* Screen area */}
-        <div className="relative overflow-hidden rounded-[2.2rem] bg-slate-50 dark:bg-zinc-900" style={{ height: 420 }}>
+        <div
+          className="relative overflow-hidden rounded-[38px] bg-white dark:bg-zinc-900"
+          style={{ height: 580 }}
+        >
           {/* Notch */}
           <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-            <div className="h-5 w-24 rounded-b-2xl bg-zinc-900" />
+            <div className="h-6 w-28 rounded-b-[18px] bg-zinc-900" />
           </div>
 
-          {/* Scrolling screen content */}
-          <div className="relative h-full w-full overflow-hidden pt-3">
-            {children}
-          </div>
-
-          {/* Home bar */}
-          <div className="absolute bottom-2 left-1/2 z-20 h-1 w-20 -translate-x-1/2 rounded-full bg-zinc-400/60 dark:bg-zinc-600" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Main exported component ────────────────────────────────────────────── */
-
-export function PhoneMockup({ locale }: { locale: string }) {
-  const [current, setCurrent] = useState(0)
-  const [direction, setDirection] = useState<1 | -1>(1)
-  const [paused, setPaused] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const goTo = (idx: number) => {
-    if (idx === current) return
-    setDirection(idx > current ? 1 : -1)
-    setCurrent(idx)
-  }
-
-  const advance = () => {
-    setDirection(1)
-    setCurrent((c) => (c + 1) % SCREENS.length)
-  }
-
-  useEffect(() => {
-    if (paused) return
-    intervalRef.current = setInterval(advance, INTERVAL_MS)
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [paused])
-
-  const { Content } = SCREENS[current]
-
-  const variants = buildVariants(direction)
-
-  return (
-    <section className="relative overflow-hidden bg-white px-4 py-20 dark:bg-zinc-950 sm:px-6 lg:px-8">
-      {/* Background gradient blob */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute right-0 top-0 h-[600px] w-[600px] translate-x-1/3 -translate-y-1/4 rounded-full bg-indigo-400/8 blur-3xl dark:bg-indigo-600/8" />
-        <div className="absolute bottom-0 left-0 h-96 w-96 -translate-x-1/4 translate-y-1/4 rounded-full bg-purple-400/8 blur-3xl dark:bg-purple-600/8" />
-      </div>
-
-      <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col items-center gap-16 lg:flex-row lg:items-center lg:gap-20">
-
-          {/* ── Left: copy + CTA ──────────────────────────────────────── */}
-          <div className="flex-1 text-center lg:text-left">
-            {/* Label pill */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-950/50 dark:text-indigo-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              How it works
-            </div>
-
-            <h2 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
-              Your wallet,{' '}
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                filled with crypto
-              </span>
-            </h2>
-
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-              Browse competitions, grab your tickets in seconds, and watch crypto land in your wallet — all from your phone.
-            </p>
-
-            {/* Step indicators */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:flex-col lg:justify-start">
-              {SCREENS.map(({ id, label }, i) => {
-                const descriptions = [
-                  'Pick a live competition with a crypto prize',
-                  'Pay securely with your card via Stripe',
-                  'Crypto sent instantly to your wallet',
-                ]
-                return (
-                  <button
-                    key={id}
-                    onClick={() => goTo(i)}
-                    className={[
-                      'flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200',
-                      current === i
-                        ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800/50 dark:bg-indigo-950/40'
-                        : 'border-transparent bg-transparent hover:bg-slate-50 dark:hover:bg-zinc-900',
-                    ].join(' ')}
-                  >
-                    <span
-                      className={[
-                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors',
-                        current === i
-                          ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white'
-                          : 'bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400',
-                      ].join(' ')}
-                    >
-                      {i + 1}
-                    </span>
-                    <div>
-                      <p
-                        className={[
-                          'text-sm font-semibold',
-                          current === i
-                            ? 'text-indigo-700 dark:text-indigo-300'
-                            : 'text-slate-700 dark:text-slate-300',
-                        ].join(' ')}
-                      >
-                        {label}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400">{descriptions[i]}</p>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="mt-8 flex justify-center gap-3 lg:justify-start">
-              <Link
-                href={`/${locale}/competitions`}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/30"
+          {/* Animated screens */}
+          <div className="relative h-full overflow-hidden pt-6">
+            <AnimatePresence initial={false} mode="wait" custom={direction}>
+              <motion.div
+                key={screen}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute inset-0 pt-6"
               >
-                Browse competitions →
-              </Link>
-            </div>
+                <CurrentScreen />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* ── Right: phone mockup ────────────────────────────────────── */}
-          <div
-            className="shrink-0"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <PhoneShell>
-              <AnimatePresence initial={false} mode="wait" custom={direction}>
-                <motion.div
-                  key={current}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-                  className="absolute inset-0"
-                >
-                  <Content />
-                </motion.div>
-              </AnimatePresence>
-            </PhoneShell>
-
-            {/* Progress dots */}
-            <div className="mt-5 flex items-center justify-center gap-2">
-              {SCREENS.map(({ id }, i) => (
-                <button
-                  key={id}
-                  onClick={() => goTo(i)}
-                  aria-label={`Go to screen ${i + 1}`}
-                  className={[
-                    'h-2 rounded-full transition-all duration-300',
-                    current === i
-                      ? 'w-6 bg-indigo-600 dark:bg-indigo-400'
-                      : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-zinc-600 dark:hover:bg-zinc-500',
-                  ].join(' ')}
-                />
-              ))}
-            </div>
-
-            {/* Auto-play progress bar */}
-            {!paused && (
-              <div className="mx-auto mt-2 h-0.5 w-28 overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-800">
-                <motion.div
-                  key={`progress-${current}`}
-                  className="h-full rounded-full bg-indigo-500"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: INTERVAL_MS / 1000, ease: 'linear' }}
-                />
-              </div>
-            )}
-          </div>
+          {/* Home indicator */}
+          <div className="absolute bottom-2 left-1/2 z-20 h-[3px] w-24 -translate-x-1/2 rounded-full bg-zinc-400/50 dark:bg-zinc-600/70" />
         </div>
       </div>
-    </section>
+
+      {/* Ambient glow under phone */}
+      <div className="pointer-events-none absolute -bottom-10 left-1/2 h-24 w-56 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-2xl dark:bg-indigo-600/30" />
+    </div>
   )
 }
