@@ -8,6 +8,7 @@ import { fmtNumber } from '@/lib/format'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CompetitionCard } from '@/components/ui/CompetitionCard'
+import { PhoneMockup } from '@/components/ui/PhoneMockup'
 import type { Competition } from '@/types'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -134,6 +135,9 @@ export default async function HomePage({ params }: HomePageProps) {
             ))}
           </div>
         </div>
+
+        {/* ── Phone Mockup / How it works ───────────────────────────────── */}
+        <PhoneMockup locale={locale} />
 
         {/* ── Live Competitions ──────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-slate-50 px-4 py-24 dark:bg-zinc-950 sm:px-6 lg:px-8">
