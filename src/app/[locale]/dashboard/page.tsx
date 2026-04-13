@@ -190,7 +190,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                       href={`/${locale}/competitions/${ticket.competition_id}`}
                       className="truncate text-sm text-indigo-600 hover:underline dark:text-indigo-400"
                     >
-                      {(ticket.competitions as { title: string } | null)?.title ?? 'View →'}
+                      {(ticket.competitions as unknown as { title: string } | null)?.title ?? 'View →'}
                     </Link>
                     <span className="text-right text-xs text-slate-400">
                       {fmtDate(ticket.created_at)}
