@@ -192,9 +192,9 @@ export default async function HomePage({ params }: HomePageProps) {
 
             {competitions && competitions.length > 0 ? (
               <>
-                <div className="mt-10 flex flex-col gap-4 md:flex-row md:flex-wrap md:justify-center">
+                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {competitions.map((comp: Competition) => (
-                    <div key={comp.id} className="w-full md:w-80">
+                    <div key={comp.id} className="h-full">
                       <CompetitionCard competition={comp} locale={locale} />
                     </div>
                   ))}

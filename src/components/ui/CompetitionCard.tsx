@@ -56,7 +56,7 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
   const imageUrl = getCryptoImageUrl(competition.crypto_type)
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-zinc-700/50 dark:bg-zinc-800/50">
+    <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-zinc-700/50 dark:bg-zinc-800/50">
       {/* Crypto-branded header */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${cardGradient} p-4`}>
         {/* Dot grid texture */}
@@ -114,11 +114,13 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
         <h3 className="line-clamp-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
           {competition.title}
         </h3>
-        {competition.description && (
-          <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-            {competition.description}
-          </p>
-        )}
+        <div className="mt-0.5 h-10">
+          {competition.description && (
+            <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
+              {competition.description}
+            </p>
+          )}
+        </div>
 
         {/* Live countdown timer */}
         <div className="mt-3">
@@ -148,7 +150,7 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
       </div>
 
       {/* CTA */}
-      <div className="px-4 pb-4">
+      <div className="mt-auto px-4 pb-4">
         <Link
           href={`/${locale}/competitions/${competition.id}`}
           aria-disabled={isSoldOut}

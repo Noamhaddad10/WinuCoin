@@ -55,9 +55,9 @@ export default async function CompetitionsPage({ params }: CompetitionsPageProps
 
           {/* Grid */}
           {competitions.length > 0 ? (
-            <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:justify-center">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {competitions.map((comp) => (
-                <div key={comp.id} className="w-full md:w-80">
+                <div key={comp.id} className="h-full">
                   <CompetitionCard competition={comp} locale={locale} />
                 </div>
               ))}
