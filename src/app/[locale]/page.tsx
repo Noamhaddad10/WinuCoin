@@ -70,7 +70,7 @@ export default async function HomePage({ params }: HomePageProps) {
     <div className="flex min-h-screen flex-col">
       <Header locale={locale} />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* ── Hero ─────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden px-4 pb-24 pt-20 sm:px-6 lg:px-8">
           {/* Background orbs */}

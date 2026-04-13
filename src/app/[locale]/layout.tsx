@@ -42,6 +42,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <html lang={locale} className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-white font-sans antialiased dark:bg-zinc-950">
+        <a href="#main-content" className="skip-to-content">
+          Skip to content
+        </a>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>{children}</ThemeProvider>
         </NextIntlClientProvider>

@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CompetitionCard } from '@/components/ui/CompetitionCard'
+import { CompetitionFilterTabs } from '@/components/ui/CompetitionFilterTabs'
 import type { Competition } from '@/types'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,10 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 interface CompetitionsPageProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ filter?: string }>
 }
 
-export default async function CompetitionsPage({ params }: CompetitionsPageProps) {
+export default async function CompetitionsPage({ params, searchParams }: CompetitionsPageProps) {
   const { locale } = await params
+  const { filter = 'all' } = await searchParams
   const t = await getTranslations('competitions')
 
   const supabase = await createClient()
@@ -35,22 +39,37 @@ export default async function CompetitionsPage({ params }: CompetitionsPageProps
       .order('end_date', { ascending: false }),
   ])
 
-  const competitions: Competition[] = [...(active ?? []), ...(others ?? [])]
+  const all: Competition[] = [...(active ?? []), ...(others ?? [])]
+  const competitions: Competition[] =
+    filter === 'active' ? (active ?? []) :
+    filter === 'ended'  ? (others ?? []) :
+    all
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-zinc-950">
       <Header locale={locale} />
 
-      <main className="flex-1 px-4 py-12 sm:px-6 lg:px-8">
+      <main id="main-content" className="flex-1 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Page header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
               {t('title')}
             </h1>
             <p className="mt-2 text-slate-500 dark:text-slate-400">
               {t('browseDesc')}
             </p>
+          </div>
+
+          {/* Filter tabs */}
+          <div className="mb-8">
+            <Suspense>
+              <CompetitionFilterTabs
+                allCount={all.length}
+                activeCount={(active ?? []).length}
+                endedCount={(others ?? []).length}
+              />
+            </Suspense>
           </div>
 
           {/* Grid */}

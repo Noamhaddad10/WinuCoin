@@ -55,7 +55,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     user && profile
       ? supabase
           .from('tickets')
-          .select('id, ticket_number, created_at, competition_id')
+          .select('id, ticket_number, created_at, competition_id, competitions(title)')
           .eq('user_id', profile.id)
           .order('created_at', { ascending: false })
           .limit(20)
@@ -84,7 +84,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       <div className="mx-auto flex w-full max-w-7xl flex-1 gap-8 px-4 py-8 sm:px-6 lg:px-8">
         <Sidebar locale={locale} isAdmin={isAdmin} />
 
-        <main className="flex-1 min-w-0">
+        <main id="main-content" className="flex-1 min-w-0">
           {/* Welcome */}
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
@@ -190,7 +190,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                       href={`/${locale}/competitions/${ticket.competition_id}`}
                       className="truncate text-sm text-indigo-600 hover:underline dark:text-indigo-400"
                     >
-                      View →
+                      {(ticket.competitions as { title: string } | null)?.title ?? 'View →'}
                     </Link>
                     <span className="text-right text-xs text-slate-400">
                       {fmtDate(ticket.created_at)}

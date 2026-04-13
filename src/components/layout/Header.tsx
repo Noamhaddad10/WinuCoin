@@ -91,8 +91,17 @@ export function Header({ locale, isAuthenticated: initialAuth, isAdmin: initialA
     { label: t('nav.howItWorks'), href: `/${locale}#how-it-works` },
   ]
 
-  const navLinkClass =
-    'rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-zinc-800 dark:hover:text-slate-100'
+  const navLinkClass = (href: string) => {
+    const isActive = href.includes('#')
+      ? false
+      : pathname === href || pathname.startsWith(href + '/')
+    return [
+      'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+      isActive
+        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
+        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-zinc-800 dark:hover:text-slate-100',
+    ].join(' ')
+  }
 
   return (
     <>
@@ -120,17 +129,17 @@ export function Header({ locale, isAuthenticated: initialAuth, isAdmin: initialA
               <Home className="h-4 w-4" />
             </Link>
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className={navLinkClass}>
+              <Link key={link.href} href={link.href} className={navLinkClass(link.href)} aria-current={pathname === link.href ? 'page' : undefined}>
                 {link.label}
               </Link>
             ))}
             {isAuthenticated && (
-              <Link href={`/${locale}/dashboard`} className={navLinkClass}>
+              <Link href={`/${locale}/dashboard`} className={navLinkClass(`/${locale}/dashboard`)} aria-current={pathname === `/${locale}/dashboard` ? 'page' : undefined}>
                 {t('nav.dashboard')}
               </Link>
             )}
             {isAdmin && (
-              <Link href={`/${locale}/admin`} className={navLinkClass}>
+              <Link href={`/${locale}/admin`} className={navLinkClass(`/${locale}/admin`)} aria-current={pathname === `/${locale}/admin` ? 'page' : undefined}>
                 {t('nav.admin')}
               </Link>
             )}

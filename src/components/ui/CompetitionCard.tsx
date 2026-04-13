@@ -49,6 +49,8 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
 
   const isSoldOut = competition.tickets_sold >= competition.max_tickets
   const progress = Math.min(100, Math.round((competition.tickets_sold / competition.max_tickets) * 100))
+  const remaining = competition.max_tickets - competition.tickets_sold
+  const isAlmostSoldOut = !isSoldOut && progress >= 80
 
   const cardGradient = CARD_GRADIENTS[competition.crypto_type] ?? DEFAULT_CARD
   const ctaGradient = CTA_GRADIENTS[competition.crypto_type] ?? DEFAULT_CTA
@@ -88,11 +90,16 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
         </div>
 
         {/* Status + crypto badges */}
-        <div className="relative flex items-center gap-1.5">
+        <div className="relative flex items-center gap-1.5 flex-wrap">
           {!isSoldOut && competition.status === 'active' && (
             <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-status-pulse" />
               {t('active')}
+            </span>
+          )}
+          {isAlmostSoldOut && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5 text-[10px] font-bold text-white">
+              🔥 {remaining} left
             </span>
           )}
           <span className="inline-flex items-center rounded-full border border-white/20 bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-sm">
