@@ -27,7 +27,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
   const admin = createAdminClient()
   const { data: competitions } = await admin
     .from('competitions')
-    .select('id, title, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn, is_published')
+    .select('id, slug, title, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn, is_published')
     .order('created_at', { ascending: false })
 
   return (
@@ -78,7 +78,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
                   )}
                 </div>
                 <p className="mt-0.5 text-xs text-slate-400">
-                  {new Date(c.end_date).toLocaleDateString()}
+                  {fmtDate(c.end_date, locale)}
                 </p>
               </div>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -115,7 +115,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
                   <Shuffle className="h-4 w-4" />
                 </Link>
                 <Link
-                  href={`/${locale}/competitions/${c.id}`}
+                  href={`/${locale}/competitions/${c.slug ?? c.id}`}
                   title={t('viewDetails')}
                   target="_blank"
                   className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-zinc-700 dark:hover:text-slate-300"
