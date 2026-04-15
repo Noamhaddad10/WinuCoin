@@ -13,7 +13,7 @@ import type { Competition } from '@/types'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('landing')
-  return { title: `WinuWallet — ${t('heroTitle')} ${t('heroTitleAccent')}` }
+  return { title: t('metaTitle') }
 }
 
 interface HomePageProps {
@@ -170,28 +170,20 @@ export default async function HomePage({ params }: HomePageProps) {
           />
 
           <div className="relative mx-auto max-w-7xl">
-            <div className="flex items-end justify-between">
-              <div className="relative">
-                {/* Dark mode glow behind heading */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -left-6 -top-6 hidden h-20 w-56 rounded-full bg-indigo-500/10 blur-3xl dark:block"
-                />
-                <h2 className="relative text-3xl font-bold text-slate-900 dark:text-slate-100">
-                  {t('competitionsTitle')}
-                </h2>
-                {/* Gradient accent underline */}
-                <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600" />
-                <p className="mt-3 text-slate-500 dark:text-slate-400">
-                  {t('heroSubtitle').split('.')[0]}.
-                </p>
-              </div>
-              <Link
-                href={`/${locale}/competitions`}
-                className="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 sm:block"
-              >
-                {t('viewAll')} →
-              </Link>
+            <div className="relative">
+              {/* Dark mode glow behind heading */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-6 -top-6 hidden h-20 w-56 rounded-full bg-indigo-500/10 blur-3xl dark:block"
+              />
+              <h2 className="relative text-3xl font-bold text-slate-900 dark:text-slate-100">
+                {t('competitionsTitle')}
+              </h2>
+              {/* Gradient accent underline */}
+              <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600" />
+              <p className="mt-3 text-slate-500 dark:text-slate-400">
+                {t('heroSubtitle').split('.')[0]}.
+              </p>
             </div>
 
             {competitions && competitions.length > 0 ? (
