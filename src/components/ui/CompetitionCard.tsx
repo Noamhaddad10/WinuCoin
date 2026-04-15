@@ -166,7 +166,7 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
       {/* CTA */}
       <div className="mt-auto px-4 pb-4">
         <Link
-          href={`/${locale}/competitions/${competition.id}`}
+          href={`/${locale}/competitions/${competition.slug ?? competition.id}`}
           aria-disabled={isSoldOut || isEnded}
           tabIndex={isSoldOut || isEnded ? -1 : undefined}
           className={[

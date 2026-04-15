@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const [{ data: competition, error: compError }, { data: publicUser }] = await Promise.all([
     admin
       .from('competitions')
-      .select('id, title, ticket_price, max_tickets, tickets_sold, status, crypto_type')
+      .select('id, slug, title, ticket_price, max_tickets, tickets_sold, status, crypto_type')
       .eq('id', competition_id)
       .single(),
     admin
@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
         quantity: count,
       },
     ],
-    success_url: `${appUrl}/${locale}/competitions/${competition_id}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/${locale}/competitions/${competition_id}`,
+    success_url: `${appUrl}/${locale}/competitions/${competition.slug ?? competition_id}/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${appUrl}/${locale}/competitions/${competition.slug ?? competition_id}`,
     metadata: {
       competition_id,
       ticket_count: String(count),

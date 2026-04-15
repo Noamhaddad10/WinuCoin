@@ -14,6 +14,7 @@ export type CompetitionStatus = 'active' | 'completed' | 'cancelled'
 
 export interface Competition {
   id: string
+  slug?: string
   title: string
   description?: string
   prize_amount: number

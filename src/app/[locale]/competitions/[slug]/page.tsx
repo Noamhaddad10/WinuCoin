@@ -14,7 +14,7 @@ import { getCryptoPrices, cryptoAmount } from '@/lib/coingecko'
 import { fmtNumber, fmtDateTime } from '@/lib/format'
 
 interface CompetitionDetailPageProps {
-  params: Promise<{ locale: string; id: string }>
+  params: Promise<{ locale: string; slug: string }>
 }
 
 const CRYPTO_BANNER: Record<string, string> = {
@@ -35,31 +35,53 @@ const CRYPTO_GLOW: Record<string, string> = {
   BNB: 'bg-yellow-500/20',
 }
 
+/** Find a competition by slug, falling back to UUID for backward compatibility. */
+async function findCompetition(supabase: Awaited<ReturnType<typeof createClient>>, slugOrId: string) {
+  // Try slug first
+  const { data: bySlug } = await supabase
+    .from('competitions')
+    .select('*')
+    .eq('slug', slugOrId)
+    .maybeSingle()
+  if (bySlug) return bySlug
+
+  // Fall back to UUID
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId)
+  if (!isUuid) return null
+
+  const { data: byId } = await supabase
+    .from('competitions')
+    .select('*')
+    .eq('id', slugOrId)
+    .maybeSingle()
+  return byId ?? null
+}
+
 export async function generateMetadata({
   params,
 }: CompetitionDetailPageProps): Promise<Metadata> {
-  const { id } = await params
+  const { slug } = await params
   const supabase = await createClient()
-  const { data } = await supabase.from('competitions').select('title').eq('id', id).single()
-  return { title: data?.title ?? 'Competition' }
+  const competition = await findCompetition(supabase, slug)
+  return { title: competition?.title ?? 'Competition' }
 }
 
 export default async function CompetitionDetailPage({
   params,
 }: CompetitionDetailPageProps) {
-  const { locale, id } = await params
+  const { locale, slug } = await params
   const t = await getTranslations('competitions')
 
   const supabase = await createClient()
 
   // Parallel fetches
   const [
-    { data: competition },
+    competition,
     {
       data: { user },
     },
   ] = await Promise.all([
-    supabase.from('competitions').select('*').eq('id', id).single(),
+    findCompetition(supabase, slug),
     supabase.auth.getUser(),
   ])
 
@@ -75,6 +97,8 @@ export default async function CompetitionDetailPage({
         .then(({ data }) => data?.id ?? null)
     : null
 
+  const competitionId = competition.id
+
   // Fetch crypto price, user tickets, and winner info in parallel
   const [prices, { data: userTickets }, { data: winnerData }] = await Promise.all([
     getCryptoPrices([competition.crypto_type]),
@@ -82,7 +106,7 @@ export default async function CompetitionDetailPage({
       ? supabase
           .from('tickets')
           .select('ticket_number')
-          .eq('competition_id', id)
+          .eq('competition_id', competitionId)
           .eq('user_id', publicUserId)
           .order('ticket_number')
       : Promise.resolve({ data: [] }),
@@ -90,7 +114,7 @@ export default async function CompetitionDetailPage({
       ? supabase
           .from('winners')
           .select('tickets(ticket_number), users(email)')
-          .eq('competition_id', id)
+          .eq('competition_id', competitionId)
           .maybeSingle()
       : Promise.resolve({ data: null }),
   ])

@@ -11,17 +11,17 @@ import { createClient } from '@/lib/supabase/server'
 export const metadata: Metadata = { title: 'Purchase Successful' }
 
 interface SuccessPageProps {
-  params: Promise<{ locale: string; id: string }>
+  params: Promise<{ locale: string; slug: string }>
   searchParams: Promise<{ session_id?: string }>
 }
 
 export default async function SuccessPage({ params, searchParams }: SuccessPageProps) {
-  const { locale, id } = await params
+  const { locale, slug } = await params
   const { session_id } = await searchParams
   const t = await getTranslations('checkout')
 
   if (!session_id) {
-    redirect(`/${locale}/competitions/${id}`)
+    redirect(`/${locale}/competitions/${slug}`)
   }
 
   const supabase = await createClient()
@@ -38,12 +38,11 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
     .eq('stripe_payment_id', session_id)
     .maybeSingle()
 
-  // Look up the competition
-  const { data: competition } = await admin
-    .from('competitions')
-    .select('title, crypto_type, prize_amount')
-    .eq('id', id)
-    .maybeSingle()
+  // Look up the competition — try slug, fall back to UUID
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+  const { data: competition } = isUuid
+    ? await admin.from('competitions').select('title, crypto_type, prize_amount').eq('id', slug).maybeSingle()
+    : await admin.from('competitions').select('title, crypto_type, prize_amount').eq('slug', slug).maybeSingle()
 
   // Look up tickets (may not exist yet if webhook hasn't fired)
   const { data: tickets } = payment
