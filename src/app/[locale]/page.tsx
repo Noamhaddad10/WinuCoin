@@ -44,6 +44,7 @@ export default async function HomePage({ params }: HomePageProps) {
       .from('competitions')
       .select('*')
       .eq('status', 'active')
+      .eq('is_published', true)
       .gt('end_date', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(6),

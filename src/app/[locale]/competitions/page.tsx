@@ -26,16 +26,19 @@ export default async function CompetitionsPage({ params, searchParams }: Competi
   const supabase = await createClient()
 
   // Active first (ending soonest), then others (most recent end_date desc)
+  // Only show published competitions to end-users
   const [{ data: active }, { data: others }] = await Promise.all([
     supabase
       .from('competitions')
       .select('*')
       .eq('status', 'active')
+      .eq('is_published', true)
       .order('end_date', { ascending: true }),
     supabase
       .from('competitions')
       .select('*')
       .neq('status', 'active')
+      .eq('is_published', true)
       .order('end_date', { ascending: false }),
   ])
 
