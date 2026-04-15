@@ -39,11 +39,19 @@ export default async function CompetitionsPage({ params, searchParams }: Competi
       .order('end_date', { ascending: false }),
   ])
 
-  const all: Competition[] = [...(active ?? []), ...(others ?? [])]
+  const now = new Date()
+  const allRaw: Competition[] = [...(active ?? []), ...(others ?? [])]
+
+  // Treat competitions past their end_date as ended regardless of DB status
+  const activeList = (active ?? []).filter((c) => new Date(c.end_date) > now)
+  const endedList = allRaw.filter(
+    (c) => c.status !== 'active' || new Date(c.end_date) <= now,
+  )
+
   const competitions: Competition[] =
-    filter === 'active' ? (active ?? []) :
-    filter === 'ended'  ? (others ?? []) :
-    all
+    filter === 'active' ? activeList :
+    filter === 'ended'  ? endedList :
+    allRaw
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-zinc-950">
@@ -65,9 +73,9 @@ export default async function CompetitionsPage({ params, searchParams }: Competi
           <div className="mb-8">
             <Suspense>
               <CompetitionFilterTabs
-                allCount={all.length}
-                activeCount={(active ?? []).length}
-                endedCount={(others ?? []).length}
+                allCount={allRaw.length}
+                activeCount={activeList.length}
+                endedCount={endedList.length}
               />
             </Suspense>
           </div>

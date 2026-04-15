@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import { Search, ArrowLeft, Minus, Plus, Lock, Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import confetti from 'canvas-confetti'
 
 const SCREEN_DURATION = 5000
@@ -20,24 +21,26 @@ const sg = (i: number) => ({
 
 /* ─── Screen 1 — Browse competitions ────────────────────────────────────── */
 function Screen1() {
+  const t = useTranslations('phoneMockup')
+
   const cards = [
     {
       symbol: '₿',
       bg: 'bg-orange-500',
-      name: 'Win 1 BTC',
-      prize: '$60,000',
-      sold: 45,
-      total: 100,
-      price: '$50',
+      name: t('card1Name'),
+      prize: '$250,000',
+      sold: 820,
+      total: 5000,
+      price: '$55',
     },
     {
       symbol: 'Ξ',
       bg: 'bg-indigo-500',
-      name: 'Win 0.5 ETH',
-      prize: '$1,800',
-      sold: 23,
-      total: 80,
-      price: '$25',
+      name: t('card2Name'),
+      prize: '$100,000',
+      sold: 1100,
+      total: 2500,
+      price: '$55',
     },
   ]
 
@@ -48,7 +51,7 @@ function Screen1() {
 
       {/* Header */}
       <motion.div {...sg(0)} className="flex items-center justify-between px-4 pb-3">
-        <span className="text-base font-bold text-slate-900 dark:text-white">Competitions</span>
+        <span className="text-base font-bold text-slate-900 dark:text-white">{t('competitions')}</span>
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800">
           <Search className="h-3.5 w-3.5 text-slate-500 dark:text-zinc-400" />
         </div>
@@ -77,7 +80,7 @@ function Screen1() {
                     </span>
                     <span className="flex items-center gap-1 text-[9px] font-bold text-green-500">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
-                      LIVE
+                      {t('live')}
                     </span>
                   </div>
                   <span className="text-base font-extrabold text-indigo-600 dark:text-indigo-400">
@@ -92,17 +95,17 @@ function Screen1() {
                     </div>
                     <div className="mt-1 flex justify-between text-[9px] text-slate-400">
                       <span>
-                        {card.sold}/{card.total} tickets
+                        {card.sold}/{card.total} {t('tickets')}
                       </span>
                       <span className="font-semibold text-slate-600 dark:text-zinc-300">
-                        {card.price}/ticket
+                        {card.price}/{t('ticket')}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
               <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-2 text-xs font-bold text-white">
-                Enter Now →
+                {t('enterNow')} →
               </button>
             </motion.div>
           )
@@ -114,6 +117,8 @@ function Screen1() {
 
 /* ─── Screen 2 — Purchase tickets ───────────────────────────────────────── */
 function Screen2() {
+  const t = useTranslations('phoneMockup')
+
   return (
     <div className="flex h-full flex-col bg-white dark:bg-zinc-900">
       <StatusBar />
@@ -123,7 +128,7 @@ function Screen2() {
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800">
           <ArrowLeft className="h-3.5 w-3.5 text-slate-600 dark:text-zinc-300" />
         </div>
-        <span className="text-base font-bold text-slate-900 dark:text-white">Purchase tickets</span>
+        <span className="text-base font-bold text-slate-900 dark:text-white">{t('purchaseTickets')}</span>
       </motion.div>
 
       <div className="flex flex-col gap-2 px-3">
@@ -136,8 +141,8 @@ function Screen2() {
             ₿
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-900 dark:text-white">Win 1 BTC</p>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">Prize pool: $60,000</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">{t('card1Name')}</p>
+            <p className="text-xs text-slate-500 dark:text-zinc-400">{t('prizePool')}: $250,000</p>
           </div>
         </motion.div>
 
@@ -146,8 +151,8 @@ function Screen2() {
           {...sg(2)}
           className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60"
         >
-          <span className="text-sm text-slate-600 dark:text-zinc-300">Ticket price</span>
-          <span className="text-sm font-bold text-slate-900 dark:text-white">$50</span>
+          <span className="text-sm text-slate-600 dark:text-zinc-300">{t('ticketPrice')}</span>
+          <span className="text-sm font-bold text-slate-900 dark:text-white">$55</span>
         </motion.div>
 
         {/* Quantity */}
@@ -155,7 +160,7 @@ function Screen2() {
           {...sg(3)}
           className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60"
         >
-          <span className="text-sm text-slate-600 dark:text-zinc-300">Quantity</span>
+          <span className="text-sm text-slate-600 dark:text-zinc-300">{t('quantity')}</span>
           <div className="flex items-center gap-3">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-700">
               <Minus className="h-3 w-3 text-slate-500" />
@@ -174,8 +179,8 @@ function Screen2() {
           {...sg(4)}
           className="flex items-center justify-between border-t border-slate-100 px-1 pt-3 dark:border-zinc-700"
         >
-          <span className="text-sm font-semibold text-slate-600 dark:text-zinc-300">Total</span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">$100</span>
+          <span className="text-sm font-semibold text-slate-600 dark:text-zinc-300">{t('total')}</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white">$110</span>
         </motion.div>
 
         {/* Pay button */}
@@ -184,7 +189,7 @@ function Screen2() {
           className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/30"
         >
           <Lock className="h-4 w-4" />
-          Pay with Stripe
+          {t('payWithStripe')}
         </motion.button>
 
         {/* Card logos */}
@@ -205,6 +210,8 @@ function Screen2() {
 
 /* ─── Screen 3 — Win! ────────────────────────────────────────────────────── */
 function Screen3() {
+  const t = useTranslations('phoneMockup')
+
   return (
     <div className="flex h-full flex-col items-center bg-white dark:bg-zinc-900">
       <StatusBar />
@@ -244,7 +251,7 @@ function Screen3() {
         transition={{ delay: 0.38 }}
         className="mt-4 text-lg font-extrabold text-slate-900 dark:text-white"
       >
-        Congratulations!
+        {t('congratulations')}
       </motion.p>
 
       {/* Amount with glow pulse */}
@@ -265,9 +272,9 @@ function Screen3() {
           transition={{ delay: 1, duration: 1.8, repeat: Infinity, repeatDelay: 0.8 }}
           className="text-3xl font-black text-slate-900 dark:text-white"
         >
-          You won 1 BTC
+          {t('youWon')}
         </motion.p>
-        <p className="text-sm text-slate-400 dark:text-zinc-400">≈ $60,000</p>
+        <p className="text-sm text-slate-400 dark:text-zinc-400">≈ $250,000</p>
       </motion.div>
 
       {/* Sent badge */}
@@ -279,7 +286,7 @@ function Screen3() {
       >
         <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
         <span className="text-sm font-semibold text-green-700 dark:text-green-400">
-          Sent to your wallet ✓
+          {t('sentToWallet')}
         </span>
       </motion.div>
 
@@ -291,7 +298,7 @@ function Screen3() {
         className="mx-3 mt-5 w-[calc(100%-1.5rem)] rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-800"
       >
         <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
-          Transaction hash
+          {t('txHash')}
         </p>
         <p className="mt-0.5 truncate font-mono text-[10px] text-slate-600 dark:text-zinc-300">
           0x7f3a9b2c4e1d5678...8b2c

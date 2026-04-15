@@ -182,6 +182,24 @@ export function CompetitionForm({ locale, mode, competition }: CompetitionFormPr
         )}
       </div>
 
+      {/* Published toggle */}
+      <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60">
+        <input
+          id="is_published"
+          name="is_published"
+          type="checkbox"
+          value="true"
+          defaultChecked={competition?.is_published ?? false}
+          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600"
+        />
+        <label htmlFor="is_published" className={labelClass}>
+          {t('fieldPublished')}
+          <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400">
+            {t('fieldPublishedHint')}
+          </span>
+        </label>
+      </div>
+
       <div className="flex items-center justify-end gap-3 pt-2">
         <button
           type="submit"

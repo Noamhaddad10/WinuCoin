@@ -27,7 +27,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
   const admin = createAdminClient()
   const { data: competitions } = await admin
     .from('competitions')
-    .select('id, title, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn')
+    .select('id, title, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn, is_published')
     .order('created_at', { ascending: false })
 
   return (
@@ -67,9 +67,16 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
               className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] items-center gap-4 border-b border-slate-50 px-5 py-4 last:border-0 hover:bg-slate-50/50 dark:border-zinc-800/50 dark:hover:bg-zinc-800/30"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
-                  {c.title}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+                    {c.title}
+                  </p>
+                  {!c.is_published && (
+                    <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+                      Draft
+                    </span>
+                  )}
+                </div>
                 <p className="mt-0.5 text-xs text-slate-400">
                   {new Date(c.end_date).toLocaleDateString()}
                 </p>

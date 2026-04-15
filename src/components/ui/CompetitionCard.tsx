@@ -47,10 +47,13 @@ const DEFAULT_PROGRESS = 'from-indigo-200 to-purple-200'
 export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
   const t = useTranslations('competitions')
 
+  const now = new Date()
+  const isExpired = new Date(competition.end_date) <= now
   const isSoldOut = competition.tickets_sold >= competition.max_tickets
+  const isEnded = isExpired || competition.status !== 'active'
   const progress = Math.min(100, Math.round((competition.tickets_sold / competition.max_tickets) * 100))
   const remaining = competition.max_tickets - competition.tickets_sold
-  const isAlmostSoldOut = !isSoldOut && progress >= 80
+  const isAlmostSoldOut = !isSoldOut && !isEnded && progress >= 80
 
   const cardGradient = CARD_GRADIENTS[competition.crypto_type] ?? DEFAULT_CARD
   const ctaGradient = CTA_GRADIENTS[competition.crypto_type] ?? DEFAULT_CTA
@@ -91,7 +94,11 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
 
         {/* Status + crypto badges */}
         <div className="relative flex items-center gap-1.5 flex-wrap">
-          {!isSoldOut && competition.status === 'active' && (
+          {isEnded || isSoldOut ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
+              {isSoldOut ? t('soldOut') : t('expired')}
+            </span>
+          ) : (
             <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-status-pulse" />
               {t('active')}
@@ -160,16 +167,16 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
       <div className="mt-auto px-4 pb-4">
         <Link
           href={`/${locale}/competitions/${competition.id}`}
-          aria-disabled={isSoldOut}
-          tabIndex={isSoldOut ? -1 : undefined}
+          aria-disabled={isSoldOut || isEnded}
+          tabIndex={isSoldOut || isEnded ? -1 : undefined}
           className={[
             'flex w-full items-center justify-center rounded-xl py-2 text-xs font-semibold transition-all duration-200',
-            isSoldOut
+            isSoldOut || isEnded
               ? 'cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500'
               : `bg-gradient-to-r ${ctaGradient} text-white shadow-sm hover:-translate-y-0.5 hover:shadow-lg`,
           ].join(' ')}
         >
-          {isSoldOut ? t('soldOut') : t('enterNow')}
+          {isSoldOut ? t('soldOut') : isEnded ? t('expired') : t('enterNow')}
         </Link>
       </div>
     </div>

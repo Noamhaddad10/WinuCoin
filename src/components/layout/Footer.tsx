@@ -16,7 +16,6 @@ export async function Footer({ locale }: FooterProps) {
 
   const companyLinks = [
     { label: t('about'), href: `/${locale}/about` },
-    { label: t('blog'), href: `/${locale}/blog` },
     { label: t('faq'), href: `/${locale}/faq` },
     { label: t('contact'), href: `/${locale}/contact` },
   ]

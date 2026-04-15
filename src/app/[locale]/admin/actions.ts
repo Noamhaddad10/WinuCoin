@@ -41,6 +41,13 @@ export async function createCompetition(locale: string, _prevState: string, form
   if (!end_date) return 'End date is required.'
   if (new Date(end_date) <= new Date()) return 'End date must be in the future.'
 
+  const maxRevenue = max_tickets * ticket_price
+  if (maxRevenue < prize_amount) {
+    return `Viability error: max revenue (${max_tickets} × $${ticket_price} = $${maxRevenue}) is less than prize amount ($${prize_amount}). Increase ticket price or max tickets.`
+  }
+
+  const is_published = formData.get('is_published') === 'true'
+
   const admin = createAdminClient()
   const { error } = await admin.from('competitions').insert({
     title: title.trim(),
@@ -53,6 +60,7 @@ export async function createCompetition(locale: string, _prevState: string, form
     end_date,
     status: 'active',
     winner_drawn: false,
+    is_published,
   })
 
   if (error) return `Database error: ${error.message}`
@@ -86,6 +94,13 @@ export async function updateCompetition(
   if (!end_date) return 'End date is required.'
   if (!['active', 'completed', 'cancelled'].includes(status)) return 'Invalid status.'
 
+  const maxRevenue = max_tickets * ticket_price
+  if (maxRevenue < prize_amount) {
+    return `Viability error: max revenue (${max_tickets} × $${ticket_price} = $${maxRevenue}) is less than prize amount ($${prize_amount}). Increase ticket price or max tickets.`
+  }
+
+  const is_published = formData.get('is_published') === 'true'
+
   const admin = createAdminClient()
   const { error } = await admin
     .from('competitions')
@@ -98,6 +113,7 @@ export async function updateCompetition(
       max_tickets,
       end_date,
       status,
+      is_published,
     })
     .eq('id', id)
 

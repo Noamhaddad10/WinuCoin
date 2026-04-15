@@ -115,11 +115,12 @@ export function PurchaseCard({
                   <button
                     key={n}
                     onClick={() => handleQuantityChange(n)}
+                    aria-label={`${n} ticket${n > 1 ? 's' : ''}`}
                     className={[
-                      'flex-1 rounded-xl py-2 text-sm font-semibold transition-all',
+                      'flex-1 rounded-xl border py-2 text-sm font-semibold transition-all',
                       quantity === n
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300',
+                        ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300',
                     ].join(' ')}
                   >
                     {n}

@@ -25,6 +25,7 @@ export interface Competition {
   end_date: string
   status: CompetitionStatus
   winner_drawn: boolean
+  is_published: boolean
   created_at: string
 }
 

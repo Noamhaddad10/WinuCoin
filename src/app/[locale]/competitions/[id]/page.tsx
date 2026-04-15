@@ -100,7 +100,8 @@ export default async function CompetitionDetailPage({
   const winnerUser = (winnerData?.users as unknown as { email: string }[] | null)?.[0] ?? null
 
   const isSoldOut = competition.tickets_sold >= competition.max_tickets
-  const isEnded = competition.status !== 'active'
+  const isExpiredByDate = new Date(competition.end_date) <= new Date()
+  const isEnded = competition.status !== 'active' || isExpiredByDate
   const progress = Math.min(
     100,
     Math.round((competition.tickets_sold / competition.max_tickets) * 100),
@@ -301,7 +302,7 @@ export default async function CompetitionDetailPage({
                     { label: t('pricePerTicket'), value: `$${competition.ticket_price}` },
                     { label: t('detailsMaxTickets'), value: fmtNumber(competition.max_tickets) },
                     { label: t('ticketsSold'), value: fmtNumber(competition.tickets_sold) },
-                    { label: t('endsAt'), value: fmtDateTime(competition.end_date) },
+                    { label: t('endsAt'), value: fmtDateTime(competition.end_date, locale) },
                     ...(cryptoPrice
                       ? [
                           {

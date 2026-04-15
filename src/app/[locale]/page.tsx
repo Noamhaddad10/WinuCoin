@@ -13,7 +13,7 @@ import type { Competition } from '@/types'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('landing')
-  return { title: `WinuWallet — Win Your Wallet` }
+  return { title: `WinuWallet — ${t('heroTitle')} ${t('heroTitleAccent')}` }
 }
 
 interface HomePageProps {
@@ -44,6 +44,7 @@ export default async function HomePage({ params }: HomePageProps) {
       .from('competitions')
       .select('*')
       .eq('status', 'active')
+      .gt('end_date', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(6),
     admin
@@ -129,24 +130,26 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
-        {/* ── Stats bar ─────────────────────────────────────────────────── */}
-        <div className="border-y border-slate-100 bg-slate-50/80 dark:border-zinc-800 dark:bg-zinc-900/60">
-          <div className="mx-auto grid max-w-5xl grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 sm:grid-cols-4">
-            {[
-              { value: fmtNumber(totalCompetitions ?? 0), label: t('statsCompetitions') },
-              { value: fmtNumber(totalWinners ?? 0), label: t('statsWinners') },
-              { value: fmtDistributed(totalDistributed), label: t('statsDistributed') },
-              { value: fmtNumber(totalTickets ?? 0), label: t('statsTickets') },
-            ].map(({ value, label }) => (
-              <div key={label} className="py-7 text-center">
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 sm:text-3xl">
-                  {value}
-                </p>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{label}</p>
-              </div>
-            ))}
+        {/* ── Stats bar — only shown once there is real data ──────────────── */}
+        {((totalWinners ?? 0) > 0 || totalDistributed > 0 || (totalTickets ?? 0) > 0) && (
+          <div className="border-y border-slate-100 bg-slate-50/80 dark:border-zinc-800 dark:bg-zinc-900/60">
+            <div className="mx-auto grid max-w-5xl grid-cols-2 divide-x divide-slate-200 dark:divide-zinc-800 sm:grid-cols-4">
+              {[
+                { value: fmtNumber(totalCompetitions ?? 0), label: t('statsCompetitions') },
+                { value: fmtNumber(totalWinners ?? 0), label: t('statsWinners') },
+                { value: fmtDistributed(totalDistributed), label: t('statsDistributed') },
+                { value: fmtNumber(totalTickets ?? 0), label: t('statsTickets') },
+              ].map(({ value, label }) => (
+                <div key={label} className="py-7 text-center">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 sm:text-3xl">
+                    {value}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ── Live Competitions ──────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-slate-50 px-4 py-24 dark:bg-zinc-950 sm:px-6 lg:px-8">
@@ -200,16 +203,14 @@ export default async function HomePage({ params }: HomePageProps) {
                   ))}
                 </div>
 
-                {competitions.length > 3 && (
-                  <div className="mt-10 text-center">
-                    <Link
-                      href={`/${locale}/competitions`}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-indigo-800/50 dark:bg-zinc-800/60 dark:text-indigo-400 dark:hover:border-indigo-700/60"
-                    >
-                      {t('viewAll')} →
-                    </Link>
-                  </div>
-                )}
+                <div className="mt-10 text-center">
+                  <Link
+                    href={`/${locale}/competitions`}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-indigo-800/50 dark:bg-zinc-800/60 dark:text-indigo-400 dark:hover:border-indigo-700/60"
+                  >
+                    {t('viewAll')} →
+                  </Link>
+                </div>
               </>
             ) : (
               <div className="mt-10 flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white dark:border-zinc-700/50 dark:bg-zinc-800/50">
@@ -222,15 +223,6 @@ export default async function HomePage({ params }: HomePageProps) {
                 </Link>
               </div>
             )}
-
-            <div className="mt-6 text-center sm:hidden">
-              <Link
-                href={`/${locale}/competitions`}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-              >
-                {t('viewAll')} →
-              </Link>
-            </div>
           </div>
         </section>
 
@@ -348,19 +340,19 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
-        {/* ── Recent Winners ─────────────────────────────────────────────── */}
-        <section className="border-t border-slate-100 bg-slate-50 px-4 py-20 dark:border-zinc-800 dark:bg-zinc-900/50 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-                {t('winnersTitle')}
-              </h2>
-              <p className="mt-3 text-slate-500 dark:text-slate-400">{t('winnersSubtitle')}</p>
-            </div>
+        {/* ── Recent Winners — only shown once there is at least one winner ── */}
+        {realWinners && realWinners.length > 0 && (
+          <section className="border-t border-slate-100 bg-slate-50 px-4 py-20 dark:border-zinc-800 dark:bg-zinc-900/50 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-5xl">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  {t('winnersTitle')}
+                </h2>
+                <p className="mt-3 text-slate-500 dark:text-slate-400">{t('winnersSubtitle')}</p>
+              </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {realWinners && realWinners.length > 0 ? (
-                realWinners.map((w) => {
+              <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {realWinners.map((w) => {
                   const user = (w.users as unknown as { email: string }[] | null)?.[0] ?? null
                   const comp = (w.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
                   const ticket = (w.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
@@ -386,17 +378,11 @@ export default async function HomePage({ params }: HomePageProps) {
                       </span>
                     </div>
                   )
-                })
-              ) : (
-                <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 bg-white py-10 text-center dark:border-zinc-700 dark:bg-zinc-900">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {t('noWinnersYet')}
-                  </p>
-                </div>
-              )}
+                })}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       <Footer locale={locale} />
