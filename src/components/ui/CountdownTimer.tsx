@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 
 function pad(n: number) {
@@ -18,19 +18,28 @@ function getTimeLeft(endDate: string) {
   }
 }
 
+const SKELETON_SENTINEL = '{"_skeleton":true}'
+
+const getServerSnapshot = () => SKELETON_SENTINEL
+
+function useCountdown(endDate: string) {
+  const subscribe = useCallback((cb: () => void) => {
+    const id = setInterval(cb, 1_000)
+    return () => clearInterval(id)
+  }, [])
+  const getSnapshot = useCallback(() => JSON.stringify(getTimeLeft(endDate)), [endDate])
+
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  if (raw === SKELETON_SENTINEL) return 'skeleton' as const
+  return JSON.parse(raw) as ReturnType<typeof getTimeLeft>
+}
+
 export function CountdownTimer({ endDate }: { endDate: string }) {
   const t = useTranslations('competitions')
-  const [mounted, setMounted] = useState(false)
-  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
+  const timeLeft = useCountdown(endDate)
 
-  useEffect(() => {
-    setMounted(true)
-    setTimeLeft(getTimeLeft(endDate))
-    const id = setInterval(() => setTimeLeft(getTimeLeft(endDate)), 1000)
-    return () => clearInterval(id)
-  }, [endDate])
-
-  if (!mounted) {
+  // Server render / pre-hydration → skeleton
+  if (timeLeft === 'skeleton') {
     return <div className="h-6 w-32 animate-pulse rounded bg-slate-100 dark:bg-zinc-800" />
   }
 

@@ -393,7 +393,6 @@ export function PhoneMockup() {
   const confettiInstanceRef = useRef<any>(null)
 
   /* ── One-time rise animation — only on first mount ───────────────────── */
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const mobile = window.innerWidth < 640
     const startRX = mobile ? 50 : 70
@@ -422,7 +421,7 @@ export function PhoneMockup() {
         transition: { duration: 2.5, ease: [0.4, 0, 0.2, 1] },
       })
     })
-  }, []) // empty deps → runs once, never again on screen changes
+  }, [phoneControls, glowControls])
 
   /* ── Confetti instance (init once) ──────────────────────────────────── */
   useEffect(() => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 
 function pad(n: number) {
@@ -18,6 +18,23 @@ function getTimeLeft(endDate: string) {
   }
 }
 
+const SKELETON_SENTINEL = '{"_skeleton":true}'
+
+const getServerSnapshot = () => SKELETON_SENTINEL
+
+/** Returns a stable subscribe + getSnapshot pair that ticks every second. */
+function useCountdown(endDate: string) {
+  const subscribe = useCallback((cb: () => void) => {
+    const id = setInterval(cb, 1_000)
+    return () => clearInterval(id)
+  }, [])
+  const getSnapshot = useCallback(() => JSON.stringify(getTimeLeft(endDate)), [endDate])
+
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  if (raw === SKELETON_SENTINEL) return 'skeleton' as const
+  return JSON.parse(raw) as ReturnType<typeof getTimeLeft>
+}
+
 interface Props {
   endDate: string
   /** When true, renders dark-background boxes (for use on banners). Default: false (light). */
@@ -28,20 +45,12 @@ interface Props {
 
 export function CardCountdownTimer({ endDate, dark = false, size = 'sm' }: Props) {
   const t = useTranslations('competitions')
-  const [mounted, setMounted] = useState(false)
-  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
-
-  useEffect(() => {
-    setMounted(true)
-    setTimeLeft(getTimeLeft(endDate))
-    const id = setInterval(() => setTimeLeft(getTimeLeft(endDate)), 1_000)
-    return () => clearInterval(id)
-  }, [endDate])
+  const timeLeft = useCountdown(endDate)
 
   const isLg = size === 'lg'
 
-  // Pre-mount skeleton
-  if (!mounted) {
+  // Server render / pre-hydration → skeleton
+  if (timeLeft === 'skeleton') {
     const skeletonBox = isLg
       ? `h-16 w-16 animate-pulse rounded-xl ${dark ? 'bg-white/10' : 'bg-slate-100 dark:bg-zinc-800'}`
       : `h-7 w-8 animate-pulse rounded ${dark ? 'bg-white/10' : 'bg-slate-100 dark:bg-zinc-800'}`

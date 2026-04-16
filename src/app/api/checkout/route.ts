@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getStripe } from '@/lib/stripe'
 
 // ── In-memory rate limiter ──────────────────────────────────────────────────
+// TODO: Replace with distributed rate limiting (Upstash Redis / Vercel KV)
+// when deploying to multi-instance or serverless environments.
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(userId: string): boolean {

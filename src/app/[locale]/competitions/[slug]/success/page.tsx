@@ -92,7 +92,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Tickets</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('tickets')}</span>
                   <span className="font-medium text-slate-900 dark:text-slate-100">
                     {ticketCount > 1
                       ? t('ticketsPurchasedPlural', { count: ticketCount })
@@ -101,7 +101,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Status</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('status')}</span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950/50 dark:text-green-400">
                     <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                     {t('paymentConfirmed')}
@@ -115,7 +115,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
                   <div className="flex items-center gap-2">
                     <Ticket className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                     <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
-                      Your ticket numbers
+                      {t('yourTicketNumbers')}
                     </p>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -134,8 +134,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
               {!ticketsReady && (
                 <div className="mt-5 rounded-xl bg-amber-50 p-4 dark:bg-amber-950/20">
                   <p className="text-sm text-amber-800 dark:text-amber-200">
-                    Your ticket numbers are being generated and will appear in your dashboard
-                    within a few seconds.
+                    {t('ticketsGenerating')}
                   </p>
                 </div>
               )}

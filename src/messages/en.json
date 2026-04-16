@@ -151,6 +151,10 @@
     "ticketsPurchasedPlural": "{count} tickets purchased",
     "competition": "Competition",
     "paymentConfirmed": "Payment confirmed",
+    "tickets": "Tickets",
+    "status": "Status",
+    "yourTicketNumbers": "Your ticket numbers",
+    "ticketsGenerating": "Your ticket numbers are being generated and will appear in your dashboard within a few seconds.",
     "viewDashboard": "View My Dashboard",
     "browseMore": "Browse More Competitions",
     "backToCompetition": "Back to Competition"

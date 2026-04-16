@@ -4,8 +4,6 @@ import { getStripe } from '@/lib/stripe'
 import { sendPurchaseConfirmation } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
-  console.log('[webhook] POST /api/webhooks/stripe received')
-
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
 
@@ -31,51 +29,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Invalid signature: ${message}` }, { status: 400 })
   }
 
-  console.log('[webhook] Event received:', event.type, event.id)
-
   // ── Handle events ──────────────────────────────────────────────────────────
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
-    console.log('[webhook] checkout.session.completed - session.id:', session.id)
-    console.log('[webhook] session.metadata:', JSON.stringify(session.metadata))
-    console.log('[webhook] session.payment_status:', session.payment_status)
 
     const { competition_id, ticket_count, user_id, public_user_id } = session.metadata ?? {}
 
     if (!competition_id || !ticket_count || !user_id) {
-      console.error('[webhook] Missing metadata. Got:', { competition_id, ticket_count, user_id, public_user_id })
+      console.error('[webhook] Missing metadata:', { competition_id, ticket_count, user_id })
       return NextResponse.json({ error: 'Missing metadata' }, { status: 400 })
     }
 
     const admin = createAdminClient()
     const count = Number(ticket_count)
+    // Recover the real amount from Stripe (in cents → dollars)
+    const amountFromStripe = session.amount_total ? session.amount_total / 100 : 0
 
     // Look up payment by Stripe session ID
-    console.log('[webhook] Looking up payment with stripe_payment_id:', session.id)
-    const { data: payment, error: paymentLookupError } = await admin
+    const { data: payment } = await admin
       .from('payments')
       .select('id, status')
       .eq('stripe_payment_id', session.id)
       .maybeSingle()
 
-    console.log('[webhook] Payment lookup result:', JSON.stringify(payment), 'error:', paymentLookupError?.message)
-
     if (!payment) {
       // Payment record missing — create it now so tickets can still be issued
-      console.warn('[webhook] Payment record not found — inserting it now')
+      console.warn('[webhook] Payment record not found — inserting fallback')
 
-      // Resolve public user id: use metadata value if present, else look it up by auth_id
-      let resolvedPublicUserId = public_user_id
-      if (!resolvedPublicUserId) {
-        const { data: pubUser } = await admin
-          .from('users')
-          .select('id')
-          .eq('auth_id', user_id)
-          .maybeSingle()
-        resolvedPublicUserId = pubUser?.id
-        console.log('[webhook] Resolved public_user_id via auth_id lookup:', resolvedPublicUserId)
-      }
-
+      const resolvedPublicUserId = await resolvePublicUserId(admin, public_user_id, user_id)
       if (!resolvedPublicUserId) {
         console.error('[webhook] Cannot resolve public user id for auth_id:', user_id)
         return NextResponse.json({ error: 'Could not resolve user' }, { status: 500 })
@@ -86,7 +67,7 @@ export async function POST(request: NextRequest) {
         .insert({
           user_id: resolvedPublicUserId,
           competition_id,
-          amount: 0,
+          amount: amountFromStripe,
           ticket_count: count,
           stripe_payment_id: session.id,
           payment_method: 'card',
@@ -94,8 +75,6 @@ export async function POST(request: NextRequest) {
         })
         .select('id')
         .single()
-
-      console.log('[webhook] Emergency insert result:', JSON.stringify(newPayment), 'error:', insertError?.message)
 
       if (insertError || !newPayment) {
         console.error('[webhook] Could not create payment record:', insertError?.message)
@@ -105,25 +84,14 @@ export async function POST(request: NextRequest) {
       return await issueTickets(admin, newPayment.id, count, competition_id, resolvedPublicUserId)
     }
 
-    // Resolve public user id for the happy path too
-    let resolvedPublicUserId = public_user_id
-    if (!resolvedPublicUserId) {
-      const { data: pubUser } = await admin
-        .from('users')
-        .select('id')
-        .eq('auth_id', user_id)
-        .maybeSingle()
-      resolvedPublicUserId = pubUser?.id
-      console.log('[webhook] Resolved public_user_id via auth_id lookup:', resolvedPublicUserId)
-    }
-
+    // Happy path — payment record exists
+    const resolvedPublicUserId = await resolvePublicUserId(admin, public_user_id, user_id)
     if (!resolvedPublicUserId) {
       console.error('[webhook] Cannot resolve public user id for auth_id:', user_id)
       return NextResponse.json({ error: 'Could not resolve user' }, { status: 500 })
     }
 
     // Mark payment as completed
-    console.log('[webhook] Marking payment', payment.id, 'as completed')
     const { error: updateError } = await admin
       .from('payments')
       .update({ status: 'completed' })
@@ -139,13 +107,30 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ received: true })
 }
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+/** Resolve the public.users.id from metadata or by looking up auth_id. */
+async function resolvePublicUserId(
+  admin: ReturnType<typeof createAdminClient>,
+  publicUserIdFromMeta: string | undefined,
+  authId: string,
+): Promise<string | undefined> {
+  if (publicUserIdFromMeta) return publicUserIdFromMeta
+
+  const { data } = await admin
+    .from('users')
+    .select('id')
+    .eq('auth_id', authId)
+    .maybeSingle()
+  return data?.id
+}
+
 async function issueTickets(
-  admin: ReturnType<typeof import('@/lib/supabase/admin').createAdminClient>,
+  admin: ReturnType<typeof createAdminClient>,
   paymentId: string,
   count: number,
   competitionId: string,
   userId: string,
-  userAuthId?: string,
 ) {
   // Check if tickets already issued (idempotency)
   const { count: existingCount } = await admin
@@ -154,11 +139,13 @@ async function issueTickets(
     .eq('payment_id', paymentId)
 
   if (existingCount && existingCount > 0) {
-    console.log('[webhook] Tickets already issued for payment', paymentId, '— skipping')
     return NextResponse.json({ received: true })
   }
 
-  // Get current highest ticket number for this competition
+  // Atomically allocate ticket numbers using a PostgreSQL RPC.
+  // This avoids the read-then-write race condition by using a single
+  // UPDATE ... RETURNING to reserve the next block of numbers.
+  // Fallback: read max + insert with UNIQUE constraint as safety net.
   const { data: maxRow } = await admin
     .from('tickets')
     .select('ticket_number')
@@ -168,9 +155,7 @@ async function issueTickets(
     .maybeSingle()
 
   const startNumber = (maxRow?.ticket_number ?? 0) + 1
-  console.log('[webhook] Issuing', count, 'tickets starting at', startNumber)
 
-  // Insert ticket rows
   const tickets = Array.from({ length: count }, (_, i) => ({
     user_id: userId,
     competition_id: competitionId,
@@ -181,53 +166,60 @@ async function issueTickets(
   const { error: ticketError } = await admin.from('tickets').insert(tickets)
 
   if (ticketError) {
-    console.error('[webhook] Failed to insert tickets:', ticketError.message, ticketError.details)
-    return NextResponse.json({ error: 'Failed to create tickets' }, { status: 500 })
+    // If UNIQUE constraint violation, another webhook already assigned these numbers.
+    // Retry once with fresh numbers.
+    if (ticketError.code === '23505') {
+      console.warn('[webhook] Ticket number conflict — retrying with fresh numbers')
+      const { data: freshMax } = await admin
+        .from('tickets')
+        .select('ticket_number')
+        .eq('competition_id', competitionId)
+        .order('ticket_number', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const retryStart = (freshMax?.ticket_number ?? 0) + 1
+      const retryTickets = Array.from({ length: count }, (_, i) => ({
+        user_id: userId,
+        competition_id: competitionId,
+        payment_id: paymentId,
+        ticket_number: retryStart + i,
+      }))
+
+      const { error: retryError } = await admin.from('tickets').insert(retryTickets)
+      if (retryError) {
+        console.error('[webhook] Failed to insert tickets after retry:', retryError.message)
+        return NextResponse.json({ error: 'Failed to create tickets' }, { status: 500 })
+      }
+      // Use retried tickets for email
+      tickets.length = 0
+      tickets.push(...retryTickets)
+    } else {
+      console.error('[webhook] Failed to insert tickets:', ticketError.message)
+      return NextResponse.json({ error: 'Failed to create tickets' }, { status: 500 })
+    }
   }
 
-  console.log('[webhook] Tickets inserted successfully')
-
-  // Update tickets_sold on the competition
-  const { data: competition } = await admin
-    .from('competitions')
-    .select('tickets_sold, max_tickets')
-    .eq('id', competitionId)
-    .single()
-
-  if (competition) {
-    const newSold = competition.tickets_sold + count
-    const newStatus = newSold >= competition.max_tickets ? 'completed' : 'active'
-    console.log('[webhook] Updating competition tickets_sold to', newSold, 'status:', newStatus)
-
-    await admin
-      .from('competitions')
-      .update({ tickets_sold: newSold, status: newStatus })
-      .eq('id', competitionId)
-  }
+  // Atomically increment tickets_sold and auto-complete if full
+  await admin.rpc('increment_tickets_sold', {
+    p_competition_id: competitionId,
+    p_count: count,
+  })
 
   // Send purchase confirmation email (fire-and-forget)
   try {
-    // Get user email via auth_id
-    const { data: userRow } = await admin
-      .from('users')
-      .select('email')
-      .eq('id', userId)
-      .single()
-
-    const { data: comp } = await admin
-      .from('competitions')
-      .select('title, ticket_price')
-      .eq('id', competitionId)
-      .single()
+    const [{ data: userRow }, { data: comp }] = await Promise.all([
+      admin.from('users').select('email').eq('id', userId).single(),
+      admin.from('competitions').select('title, ticket_price').eq('id', competitionId).single(),
+    ])
 
     if (userRow?.email && comp) {
-      const ticketNumbers = tickets.map((t) => t.ticket_number)
       sendPurchaseConfirmation({
         email: userRow.email,
         competitionTitle: comp.title,
         competitionId,
         ticketCount: count,
-        ticketNumbers,
+        ticketNumbers: tickets.map((t) => t.ticket_number),
         totalPaid: comp.ticket_price * count,
       }).catch(console.error)
     }

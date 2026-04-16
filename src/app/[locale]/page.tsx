@@ -61,6 +61,14 @@ export default async function HomePage({ params }: HomePageProps) {
 
   const totalDistributed = completedComps?.reduce((sum, c) => sum + (c.prize_amount ?? 0), 0) ?? 0
 
+  // Pre-compute days-ago for each winner (avoids calling Date.now() inside render JSX)
+  const winnerDaysAgo = new Map(
+    (realWinners ?? []).map((w) => [
+      w.id,
+      Math.floor((new Date().getTime() - new Date(w.created_at).getTime()) / 86400000),
+    ]),
+  )
+
   function fmtDistributed(n: number): string {
     if (n === 0) return '$0'
     if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
@@ -349,7 +357,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   const user = (w.users as unknown as { email: string }[] | null)?.[0] ?? null
                   const comp = (w.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
                   const ticket = (w.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
-                  const daysAgo = Math.floor((Date.now() - new Date(w.created_at).getTime()) / 86400000)
+                  const daysAgo = winnerDaysAgo.get(w.id) ?? 0
                   return (
                     <div
                       key={w.id}

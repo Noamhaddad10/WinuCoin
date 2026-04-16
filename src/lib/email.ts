@@ -3,7 +3,7 @@ import { welcomeEmail } from './email-templates/welcome'
 import { purchaseConfirmationEmail } from './email-templates/purchase-confirmation'
 import { winnerAnnouncementEmail } from './email-templates/winner-announcement'
 
-const FROM = 'WinuWallet <onboarding@resend.dev>'
+const FROM = process.env.EMAIL_FROM ?? 'WinuWallet <noreply@winuwallet.com>'
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY

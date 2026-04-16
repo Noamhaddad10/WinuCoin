@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -14,7 +13,6 @@ interface LoginFormProps {
 
 export function LoginForm({ locale }: LoginFormProps) {
   const t = useTranslations('auth')
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const [email, setEmail] = useState('')

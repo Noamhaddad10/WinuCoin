@@ -48,9 +48,33 @@ export async function createCompetition(locale: string, _prevState: string, form
 
   const is_published = formData.get('is_published') === 'true'
 
+  // Auto-generate a URL-friendly slug from the title, with dedup
+  let slug = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80)
+
   const admin = createAdminClient()
+
+  // Ensure slug is unique — append -2, -3, etc. if needed
+  const { data: existing } = await admin
+    .from('competitions')
+    .select('slug')
+    .like('slug', `${slug}%`)
+  if (existing && existing.length > 0) {
+    const taken = new Set(existing.map((r) => r.slug))
+    if (taken.has(slug)) {
+      let suffix = 2
+      while (taken.has(`${slug}-${suffix}`)) suffix++
+      slug = `${slug}-${suffix}`
+    }
+  }
+
   const { error } = await admin.from('competitions').insert({
     title: title.trim(),
+    slug,
     description: description?.trim() || null,
     prize_amount,
     crypto_type,
@@ -170,11 +194,12 @@ export async function drawWinner(competitionId: string): Promise<
     .eq('id', winningTicket.user_id)
     .single()
 
-  // Insert into winners table
+  // Insert into winners table (announced = true so RLS allows user reads)
   const { error: winnerError } = await admin.from('winners').insert({
     competition_id: competitionId,
     user_id: winningTicket.user_id,
     ticket_id: winningTicket.id,
+    announced: true,
   })
 
   if (winnerError) return { ok: false, error: `Failed to save winner: ${winnerError.message}` }
