@@ -20,10 +20,10 @@
   },
   "auth": {
     "signIn": "Connexion à WinuWallet",
-    "signInSubtitle": "Entrez votre email — nous vous enverrons un lien de connexion magique",
+    "signInSubtitle": "Entrez votre email — nous vous enverrons un code à 6 chiffres",
     "email": "Adresse email",
     "emailPlaceholder": "vous@exemple.com",
-    "sendCode": "Envoyer le lien magique",
+    "sendCode": "Recevoir le code",
     "sendingCode": "Envoi…",
     "codeSent": "Vérifiez votre boîte — nous avons envoyé un code à 6 chiffres à",
     "otpLabel": "Code unique",
@@ -31,6 +31,10 @@
     "verify": "Vérifier le code",
     "verifying": "Vérification…",
     "changeEmail": "Utiliser un autre email",
+    "resendCode": "Renvoyer le code",
+    "resending": "Envoi…",
+    "resendIn": "Renvoyer dans {seconds}s",
+    "codeResent": "Code renvoyé.",
     "noAccount": "Pas de compte ? Il sera créé automatiquement.",
     "trustSecure": "Sécurisé & chiffré",
     "trustNoPassword": "Pas de mot de passe",
@@ -38,8 +42,9 @@
     "errors": {
       "invalidEmail": "Veuillez entrer une adresse email valide",
       "sendFailed": "Échec de l'envoi. Veuillez réessayer.",
-      "verifyFailed": "Code invalide ou expiré. Veuillez réessayer.",
-      "invalidOtp": "Veuillez entrer un code à 6 chiffres"
+      "verifyFailed": "Code invalide ou expiré, réessayez.",
+      "invalidOtp": "Veuillez entrer un code à 6 chiffres",
+      "resendFailed": "Impossible de renvoyer le code. Réessayez."
     }
   },
   "landing": {

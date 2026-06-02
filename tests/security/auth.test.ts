@@ -63,11 +63,12 @@ describe('authentication & authorization', () => {
     expect(content).toContain('303') // redirect status
   })
 
-  it('auth callback route validates code parameter', () => {
+  it('auth callback route validates token_hash and type parameters', () => {
     const callbackFile = path.join(SRC_DIR, 'app/auth/callback/route.ts')
     const content = fs.readFileSync(callbackFile, 'utf-8')
-    expect(content).toContain("searchParams.get('code')")
-    expect(content).toContain('exchangeCodeForSession')
+    expect(content).toContain("searchParams.get('token_hash')")
+    expect(content).toContain("searchParams.get('type')")
+    expect(content).toContain('verifyOtp')
   })
 
   it('auth callback auto-creates public user row', () => {
