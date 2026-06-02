@@ -23,8 +23,11 @@ export async function winnerAnnouncementEmail(
   const t = createTranslator({ locale, messages, namespace: 'emails.winner' })
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
-  const numberLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
-  const formattedAmount = new Intl.NumberFormat(numberLocale).format(prizeAmount)
+  const numberLocale = locale === 'fr' ? 'fr-FR' : 'en-GB'
+  const formattedAmount = new Intl.NumberFormat(numberLocale, {
+    style: 'currency',
+    currency: 'GBP',
+  }).format(prizeAmount)
 
   const subject = t('subject', { amount: formattedAmount, crypto: cryptoType })
 
@@ -35,7 +38,7 @@ export async function winnerAnnouncementEmail(
 
     <div class="win-box">
       <div class="win-emoji">🎉</div>
-      <div class="win-prize">$${t('winPrize', { amount: formattedAmount, crypto: cryptoType })}</div>
+      <div class="win-prize">${t('winPrize', { amount: formattedAmount, crypto: cryptoType })}</div>
       <div class="win-ticket">${t('winTicket', { number: winningTicketNumber })}</div>
     </div>
 
@@ -46,7 +49,7 @@ export async function winnerAnnouncementEmail(
       </div>
       <div class="info-row">
         <span class="info-label">${t('labelPrize')}</span>
-        <span class="info-value">$${formattedAmount} ${cryptoType}</span>
+        <span class="info-value">${formattedAmount} ${cryptoType}</span>
       </div>
       <div class="info-row">
         <span class="info-label">${t('labelWinningTicket')}</span>

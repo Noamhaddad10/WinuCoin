@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { fmtDate } from '@/lib/format'
+import { fmtDate, formatGBP } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -126,7 +126,7 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
                   {compTitle ?? '—'}
                 </span>
                 <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  ${p.amount?.toFixed(2)}
+                  {formatGBP(p.amount ?? 0)}
                 </span>
                 <span className="text-sm text-slate-600 dark:text-slate-400">{p.ticket_count}</span>
                 <span

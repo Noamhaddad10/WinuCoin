@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Shuffle, Trophy, AlertCircle, Loader2, X } from 'lucide-react'
 import { drawWinner } from '@/app/[locale]/admin/actions'
-import { fmtNumber, fmtDateTime } from '@/lib/format'
+import { formatGBP, fmtDateTime } from '@/lib/format'
 import type { Competition } from '@/types'
 
 interface Ticket {
@@ -141,7 +141,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
           {[
             {
               label: t('fieldPrize'),
-              value: `$${fmtNumber(competition.prize_amount)} ${competition.crypto_type}`,
+              value: `${formatGBP(competition.prize_amount)} ${competition.crypto_type}`,
             },
             { label: t('fieldTicketsSold'), value: `${tickets.length} / ${competition.max_tickets}` },
             {

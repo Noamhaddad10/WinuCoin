@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Trophy, CreditCard, Zap, ShieldCheck, BarChart3, Lock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { fmtNumber } from '@/lib/format'
+import { fmtNumber, formatGBP } from '@/lib/format'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CompetitionCard } from '@/components/ui/CompetitionCard'
@@ -71,10 +71,10 @@ export default async function HomePage({ params }: HomePageProps) {
   )
 
   function fmtDistributed(n: number): string {
-    if (n === 0) return '$0'
-    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
-    if (n >= 1_000) return `$${Math.round(n / 1_000)}K`
-    return `$${n}`
+    if (n === 0) return '£0'
+    if (n >= 1_000_000) return `£${(n / 1_000_000).toFixed(1)}M`
+    if (n >= 1_000) return `£${Math.round(n / 1_000)}K`
+    return `£${n}`
   }
 
   return (
@@ -372,7 +372,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                          ${fmtNumber(comp?.prize_amount ?? 0)} {comp?.crypto_type}
+                          {formatGBP(comp?.prize_amount ?? 0)} {comp?.crypto_type}
                         </p>
                         <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                           {t('winnerTicketLine', {

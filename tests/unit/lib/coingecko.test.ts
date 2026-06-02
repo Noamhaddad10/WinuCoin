@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getCryptoPrices, cryptoAmount } from '@/lib/coingecko'
 
 describe('cryptoAmount', () => {
-  it('converts USD to crypto amount', () => {
-    const result = cryptoAmount(500, 65000)
-    // 500 / 65000 = ~0.00769230...
-    expect(parseFloat(result)).toBeCloseTo(0.00769, 4)
+  it('converts GBP to crypto amount', () => {
+    const result = cryptoAmount(500, 50000)
+    // 500 / 50000 = 0.01
+    expect(parseFloat(result)).toBeCloseTo(0.01, 4)
   })
 
   it('handles large prize with small crypto price', () => {
@@ -15,8 +15,8 @@ describe('cryptoAmount', () => {
   })
 
   it('handles very small amounts with exponential notation', () => {
-    const result = cryptoAmount(0.01, 65000)
-    // 0.01 / 65000 = ~1.538e-7 → should be in exponential
+    const result = cryptoAmount(0.01, 50000)
+    // 0.01 / 50000 = 2e-7 → should be in exponential
     expect(result).toContain('e')
   })
 
@@ -51,20 +51,20 @@ describe('getCryptoPrices', () => {
     vi.unstubAllGlobals()
   })
 
-  it('parses valid CoinGecko response', async () => {
+  it('parses valid CoinGecko GBP response', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
         ok: true,
         json: () =>
           Promise.resolve({
-            bitcoin: { usd: 65000 },
-            ethereum: { usd: 3500 },
+            bitcoin: { gbp: 50000 },
+            ethereum: { gbp: 2800 },
           }),
       }),
     )
     const result = await getCryptoPrices(['BTC', 'ETH'])
-    expect(result).toEqual({ BTC: 65000, ETH: 3500 })
+    expect(result).toEqual({ BTC: 50000, ETH: 2800 })
     vi.unstubAllGlobals()
   })
 
@@ -75,29 +75,29 @@ describe('getCryptoPrices', () => {
         ok: true,
         json: () =>
           Promise.resolve({
-            bitcoin: { usd: 65000 },
-            ethereum: { usd: 3500 },
-            solana: { usd: 150 },
+            bitcoin: { gbp: 50000 },
+            ethereum: { gbp: 2800 },
+            solana: { gbp: 120 },
           }),
       }),
     )
     const result = await getCryptoPrices(['BTC'])
-    expect(result).toEqual({ BTC: 65000 })
+    expect(result).toEqual({ BTC: 50000 })
     expect(result).not.toHaveProperty('ETH')
     vi.unstubAllGlobals()
   })
 
-  it('calls the correct CoinGecko URL', async () => {
+  it('calls the correct CoinGecko URL with GBP currency', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ bitcoin: { usd: 65000 } }),
+      json: () => Promise.resolve({ bitcoin: { gbp: 50000 } }),
     })
     vi.stubGlobal('fetch', mockFetch)
 
     await getCryptoPrices(['BTC'])
 
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('api.coingecko.com/api/v3/simple/price'),
+      expect.stringContaining('vs_currencies=gbp'),
       expect.objectContaining({ next: { revalidate: 3600 } }),
     )
     vi.unstubAllGlobals()

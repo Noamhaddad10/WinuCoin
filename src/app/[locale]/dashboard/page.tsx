@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Ticket, Trophy, Award } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { fmtNumber, fmtDate } from '@/lib/format'
+import { fmtDate, formatGBP } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -117,7 +117,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-amber-900 dark:text-amber-100">
                         {t('youWonBanner', {
-                          amount: fmtNumber(comp?.prize_amount ?? 0),
+                          amount: formatGBP(comp?.prize_amount ?? 0),
                           crypto: comp?.crypto_type ?? '',
                         })}
                       </p>

@@ -11,7 +11,7 @@ import { PurchaseCard } from '@/components/competitions/PurchaseCard'
 import Image from 'next/image'
 import { CryptoIcon, getCryptoImageUrl } from '@/components/ui/CryptoIcons'
 import { getCryptoPrices, cryptoAmount } from '@/lib/coingecko'
-import { fmtNumber, fmtDateTime } from '@/lib/format'
+import { fmtNumber, fmtDateTime, formatGBP, formatGBPCompact } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 
 interface CompetitionDetailPageProps {
@@ -215,13 +215,13 @@ export default async function CompetitionDetailPage({
                 {localized.title}
               </h1>
 
-              {/* Prize — USD primary */}
+              {/* Prize — GBP primary */}
               <div className="mt-2">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-white/55">
                   {t('prizeFixedLabel')}
                 </p>
                 <p className="mt-0.5 text-4xl font-bold tracking-tight text-white drop-shadow-sm sm:text-5xl">
-                  ${fmtNumber(competition.prize_amount)}
+                  {formatGBPCompact(competition.prize_amount)}
                 </p>
                 {cryptoPrice && (
                   <p className="mt-1 text-sm text-white/70">
@@ -327,7 +327,7 @@ export default async function CompetitionDetailPage({
                 <dl className="divide-y divide-slate-100 dark:divide-zinc-800">
                   {[
                     { label: t('detailsCrypto'), value: competition.crypto_type },
-                    { label: t('pricePerTicket'), value: `$${competition.ticket_price}` },
+                    { label: t('pricePerTicket'), value: formatGBP(competition.ticket_price) },
                     { label: t('detailsMaxTickets'), value: fmtNumber(competition.max_tickets) },
                     { label: t('ticketsSold'), value: fmtNumber(competition.tickets_sold) },
                     { label: t('endsAt'), value: fmtDateTime(competition.end_date, locale) },
@@ -335,7 +335,7 @@ export default async function CompetitionDetailPage({
                       ? [
                           {
                             label: t('cryptoPriceLabel', { crypto: competition.crypto_type }),
-                            value: `$${fmtNumber(cryptoPrice)} USD`,
+                            value: formatGBP(cryptoPrice),
                           },
                         ]
                       : []),

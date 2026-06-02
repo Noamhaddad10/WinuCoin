@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { fmtNumber, fmtUSD, fmtDate, fmtDateTime } from '@/lib/format'
+import { fmtNumber, formatGBP, formatGBPCompact, fmtDate, fmtDateTime } from '@/lib/format'
 
 describe('fmtNumber', () => {
   it('formats integers with commas', () => {
@@ -23,25 +23,35 @@ describe('fmtNumber', () => {
   })
 })
 
-describe('fmtUSD', () => {
-  it('formats with 2 decimal places', () => {
-    expect(fmtUSD(1234.5)).toBe('1,234.50')
+describe('formatGBP', () => {
+  it('formats with pound symbol and 2 decimal places', () => {
+    expect(formatGBP(1234.5)).toBe('£1,234.50')
   })
 
   it('formats whole numbers with .00', () => {
-    expect(fmtUSD(100)).toBe('100.00')
+    expect(formatGBP(100)).toBe('£100.00')
   })
 
   it('formats zero', () => {
-    expect(fmtUSD(0)).toBe('0.00')
+    expect(formatGBP(0)).toBe('£0.00')
   })
 
   it('rounds to 2 decimal places', () => {
-    expect(fmtUSD(99.999)).toBe('100.00')
+    expect(formatGBP(99.999)).toBe('£100.00')
   })
 
   it('formats large amounts', () => {
-    expect(fmtUSD(65000)).toBe('65,000.00')
+    expect(formatGBP(65000)).toBe('£65,000.00')
+  })
+})
+
+describe('formatGBPCompact', () => {
+  it('drops decimals for whole numbers', () => {
+    expect(formatGBPCompact(250000)).toBe('£250,000')
+  })
+
+  it('keeps decimals for fractional amounts', () => {
+    expect(formatGBPCompact(9.99)).toBe('£9.99')
   })
 })
 

@@ -113,12 +113,12 @@ export async function POST(request: NextRequest) {
     line_items: [
       {
         price_data: {
-          currency: 'usd',
+          currency: 'gbp',
           product_data: {
             name: `${count} ticket${count > 1 ? 's' : ''} — ${localizeCompetition(competition, locale).title}`,
             description: `${competition.crypto_type} Prize Competition on WinuWallet`,
           },
-          unit_amount: Math.round(competition.ticket_price * 100), // cents
+          unit_amount: Math.round(competition.ticket_price * 100), // pence
         },
         quantity: count,
       },

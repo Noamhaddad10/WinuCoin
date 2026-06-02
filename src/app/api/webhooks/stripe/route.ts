@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     const admin = createAdminClient()
     const count = Number(ticket_count)
-    // Recover the real amount from Stripe (in cents → dollars)
+    // Recover the real amount from Stripe (in pence → pounds)
     const amountFromStripe = session.amount_total ? session.amount_total / 100 : 0
 
     // Look up payment by Stripe session ID

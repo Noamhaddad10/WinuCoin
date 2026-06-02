@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { CardCountdownTimer } from './CardCountdownTimer'
 import { getCryptoImageUrl, CryptoIcon } from './CryptoIcons'
-import { fmtNumber } from '@/lib/format'
+import { formatGBP, formatGBPCompact } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 import type { Competition } from '@/types'
 
@@ -120,7 +120,7 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
         <div className="relative mt-3">
           <p className="text-xs font-medium uppercase tracking-wider text-white/60">{t('prizePool')}</p>
           <p className="text-3xl font-bold tracking-tight text-white drop-shadow-sm">
-            ${fmtNumber(competition.prize_amount)}
+            {formatGBPCompact(competition.prize_amount)}
           </p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
           {t('ticketPrice')}:{' '}
           <strong className="font-semibold text-slate-900 dark:text-slate-100">
-            ${competition.ticket_price}
+            {formatGBP(competition.ticket_price)}
           </strong>
         </p>
       </div>

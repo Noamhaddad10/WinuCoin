@@ -3,6 +3,11 @@ import enMessages from '@/messages/en.json'
 import frMessages from '@/messages/fr.json'
 import { baseTemplate } from './base'
 
+function formatGBPForLocale(amount: number, locale: string): string {
+  const loc = locale === 'fr' ? 'fr-FR' : 'en-GB'
+  return new Intl.NumberFormat(loc, { style: 'currency', currency: 'GBP' }).format(amount)
+}
+
 type Messages = typeof enMessages
 const ALL_MESSAGES: Record<string, Messages> = { en: enMessages, fr: frMessages }
 
@@ -54,7 +59,7 @@ export async function purchaseConfirmationEmail(
       </div>
       <div class="info-row">
         <span class="info-label">${t('labelTotalPaid')}</span>
-        <span class="info-value">$${totalPaid.toFixed(2)}</span>
+        <span class="info-value">${formatGBPForLocale(totalPaid, locale)}</span>
       </div>
     </div>
 

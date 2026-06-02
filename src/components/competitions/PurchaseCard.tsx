@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { ShoppingCart, LogIn, Loader2, AlertCircle } from 'lucide-react'
-import { fmtNumber } from '@/lib/format'
+import { formatGBP } from '@/lib/format'
 import type { Competition } from '@/types'
 
 interface PurchaseCardProps {
@@ -35,7 +35,7 @@ export function PurchaseCard({
   const isEnded = competition.status !== 'active'
   const isDisabled = isSoldOut || isEnded || !isAuthenticated
 
-  const total = (competition.ticket_price * quantity).toFixed(2)
+  const total = competition.ticket_price * quantity
 
   function handleQuantityChange(val: number) {
     setQuantity(Math.max(1, Math.min(maxQty, val)))
@@ -82,7 +82,7 @@ export function PurchaseCard({
           {t('pricePerTicket')}
         </p>
         <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-          ${fmtNumber(competition.ticket_price)}
+          {formatGBP(competition.ticket_price)}
         </p>
         {!isEnded && !isSoldOut && (
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -146,16 +146,16 @@ export function PurchaseCard({
             <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4 dark:bg-zinc-800/60">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-500 dark:text-slate-400">
-                  ${competition.ticket_price} × {quantity}
+                  {formatGBP(competition.ticket_price)} × {quantity}
                 </span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
-                  ${total}
+                  {formatGBP(total)}
                 </span>
               </div>
               {cryptoPrice && (
                 <div className="flex items-center justify-between text-xs text-slate-400">
                   <span>{t('cryptoPriceLabel', { crypto: competition.crypto_type })}</span>
-                  <span>${fmtNumber(cryptoPrice)}</span>
+                  <span>{formatGBP(cryptoPrice)}</span>
                 </div>
               )}
               <div className="border-t border-slate-200 pt-2 dark:border-zinc-700">
@@ -164,7 +164,7 @@ export function PurchaseCard({
                     {t('total')}
                   </span>
                   <span className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                    ${total}
+                    {formatGBP(total)}
                   </span>
                 </div>
               </div>

@@ -8,11 +8,11 @@ const COINGECKO_IDS: Record<string, string> = {
 }
 
 interface CoinGeckoResponse {
-  [id: string]: { usd: number }
+  [id: string]: { gbp: number }
 }
 
 /**
- * Fetch current USD prices for the given crypto symbols.
+ * Fetch current GBP prices for the given crypto symbols.
  * Results are cached by Next.js for 1 hour via the fetch cache.
  */
 export async function getCryptoPrices(
@@ -27,7 +27,7 @@ export async function getCryptoPrices(
 
   try {
     const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`,
+      `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=gbp`,
       { next: { revalidate: 3600 } }, // cache for 1 hour
     )
 
@@ -37,8 +37,8 @@ export async function getCryptoPrices(
 
     const result: Record<string, number> = {}
     for (const [symbol, geckoId] of Object.entries(COINGECKO_IDS)) {
-      if (data[geckoId]?.usd && cryptos.includes(symbol)) {
-        result[symbol] = data[geckoId].usd
+      if (data[geckoId]?.gbp && cryptos.includes(symbol)) {
+        result[symbol] = data[geckoId].gbp
       }
     }
     return result
@@ -48,11 +48,11 @@ export async function getCryptoPrices(
 }
 
 /**
- * Convert a USD prize amount to a crypto quantity string.
- * e.g. cryptoAmount(500, 65000) → "0.007692"
+ * Convert a GBP prize amount to a crypto quantity string.
+ * e.g. cryptoAmount(500, 50000) → "0.01"
  */
-export function cryptoAmount(prizeUsd: number, cryptoUsd: number): string {
-  const amount = prizeUsd / cryptoUsd
+export function cryptoAmount(prizeGbp: number, cryptoGbp: number): string {
+  const amount = prizeGbp / cryptoGbp
   // Show up to 6 significant figures, strip trailing zeros
   return amount < 0.001
     ? amount.toExponential(4)

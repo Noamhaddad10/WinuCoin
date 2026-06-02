@@ -28,19 +28,19 @@ function Screen1() {
       symbol: '₿',
       bg: 'bg-orange-500',
       name: t('card1Name'),
-      prize: '$250,000',
+      prize: '£250,000',
       sold: 820,
       total: 5000,
-      price: '$55',
+      price: '£55',
     },
     {
       symbol: 'Ξ',
       bg: 'bg-indigo-500',
       name: t('card2Name'),
-      prize: '$100,000',
+      prize: '£100,000',
       sold: 1100,
       total: 2500,
-      price: '$55',
+      price: '£55',
     },
   ]
 
@@ -142,7 +142,7 @@ function Screen2() {
           </div>
           <div>
             <p className="text-sm font-bold text-slate-900 dark:text-white">{t('card1Name')}</p>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">{t('prizePool')}: $250,000</p>
+            <p className="text-xs text-slate-500 dark:text-zinc-400">{t('prizePool')}: £250,000</p>
           </div>
         </motion.div>
 
@@ -152,7 +152,7 @@ function Screen2() {
           className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/60"
         >
           <span className="text-sm text-slate-600 dark:text-zinc-300">{t('ticketPrice')}</span>
-          <span className="text-sm font-bold text-slate-900 dark:text-white">$55</span>
+          <span className="text-sm font-bold text-slate-900 dark:text-white">£55</span>
         </motion.div>
 
         {/* Quantity */}
@@ -180,7 +180,7 @@ function Screen2() {
           className="flex items-center justify-between border-t border-slate-100 px-1 pt-3 dark:border-zinc-700"
         >
           <span className="text-sm font-semibold text-slate-600 dark:text-zinc-300">{t('total')}</span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">$110</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white">£110</span>
         </motion.div>
 
         {/* Pay button */}
@@ -274,7 +274,7 @@ function Screen3() {
         >
           {t('youWon')}
         </motion.p>
-        <p className="text-sm text-slate-400 dark:text-zinc-400">≈ $250,000</p>
+        <p className="text-sm text-slate-400 dark:text-zinc-400">≈ £250,000</p>
       </motion.div>
 
       {/* Sent badge */}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { UserRoleForm } from '@/components/admin/UserRoleForm'
-import { fmtDate } from '@/lib/format'
+import { fmtDate, formatGBP } from '@/lib/format'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -96,7 +96,7 @@ export default async function AdminUsersPage({ params, searchParams }: PageProps
                 {ticketsByUser[user.id] ?? 0}
               </span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                ${(spendByUser[user.id] ?? 0).toFixed(2)}
+                {formatGBP(spendByUser[user.id] ?? 0)}
               </span>
               <span className="text-xs text-slate-400">
                 {fmtDate(user.created_at)}

@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { Plus, Pencil, Shuffle, ExternalLink } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { fmtNumber, fmtDate } from '@/lib/format'
+import { fmtDate, formatGBP } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -83,11 +83,11 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
                 </p>
               </div>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                ${fmtNumber(c.prize_amount)}
+                {formatGBP(c.prize_amount)}
                 <span className="ml-1 text-xs font-normal text-slate-400">{c.crypto_type}</span>
               </span>
               <span className="text-sm text-slate-600 dark:text-slate-400">
-                ${c.ticket_price}
+                {formatGBP(c.ticket_price)}
               </span>
               <span className="text-sm text-slate-600 dark:text-slate-400">
                 {c.tickets_sold}/{c.max_tickets}

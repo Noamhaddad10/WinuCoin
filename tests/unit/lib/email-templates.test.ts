@@ -83,9 +83,9 @@ describe('purchaseConfirmationEmail', () => {
     expect(html).toContain('#44')
   })
 
-  it('includes total paid amount', async () => {
+  it('includes total paid amount in GBP', async () => {
     const { html } = await purchaseConfirmationEmail(opts)
-    expect(html).toContain('$30.00')
+    expect(html).toContain('£30.00')
   })
 
   it('includes competition title', async () => {

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
-import { Users, Trophy, DollarSign, Ticket, Plus, Users2, CreditCard } from 'lucide-react'
+import { Users, Trophy, PoundSterling, Ticket, Plus, Users2, CreditCard } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { StatsCard } from '@/components/ui/StatsCard'
-import { fmtUSD, fmtDate } from '@/lib/format'
+import { formatGBP, fmtDate } from '@/lib/format'
 import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -65,8 +65,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
         />
         <StatsCard
           label={t('totalRevenue')}
-          value={`$${fmtUSD(totalRevenue)}`}
-          icon={<DollarSign className="h-5 w-5" />}
+          value={formatGBP(totalRevenue)}
+          icon={<PoundSterling className="h-5 w-5" />}
         />
         <StatsCard
           label={t('totalTickets')}
@@ -142,7 +142,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
                     {competitionTitle ?? '—'}
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    ${p.amount?.toFixed(2)}
+                    {formatGBP(p.amount ?? 0)}
                   </span>
                   <span className="text-sm text-slate-600 dark:text-slate-400">
                     {p.ticket_count}
