@@ -47,31 +47,59 @@ export function CompetitionForm({ locale, mode, competition }: CompetitionFormPr
         </div>
       )}
 
-      <div>
-        <label htmlFor="title" className={labelClass}>
-          {t('fieldTitle')}
-        </label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          required
-          defaultValue={competition?.title}
-          className={`mt-1.5 ${fieldClass}`}
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="title_fr" className={labelClass}>
+            {t('fieldTitleFr')}
+          </label>
+          <input
+            id="title_fr"
+            name="title_fr"
+            type="text"
+            defaultValue={competition?.title_fr ?? ''}
+            className={`mt-1.5 ${fieldClass}`}
+          />
+        </div>
+        <div>
+          <label htmlFor="title_en" className={labelClass}>
+            {t('fieldTitleEn')}
+          </label>
+          <input
+            id="title_en"
+            name="title_en"
+            type="text"
+            defaultValue={competition?.title_en ?? ''}
+            className={`mt-1.5 ${fieldClass}`}
+          />
+        </div>
       </div>
+      <p className="-mt-3 text-xs text-slate-500 dark:text-slate-400">{t('fieldTitleHint')}</p>
 
-      <div>
-        <label htmlFor="description" className={labelClass}>
-          {t('fieldDescription')}
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={3}
-          defaultValue={competition?.description ?? ''}
-          className={`mt-1.5 ${fieldClass} resize-none`}
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="description_fr" className={labelClass}>
+            {t('fieldDescriptionFr')}
+          </label>
+          <textarea
+            id="description_fr"
+            name="description_fr"
+            rows={3}
+            defaultValue={competition?.description_fr ?? ''}
+            className={`mt-1.5 ${fieldClass} resize-none`}
+          />
+        </div>
+        <div>
+          <label htmlFor="description_en" className={labelClass}>
+            {t('fieldDescriptionEn')}
+          </label>
+          <textarea
+            id="description_en"
+            name="description_en"
+            rows={3}
+            defaultValue={competition?.description_en ?? ''}
+            className={`mt-1.5 ${fieldClass} resize-none`}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

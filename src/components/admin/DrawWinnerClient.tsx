@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Shuffle, Trophy, AlertCircle, Loader2, X } from 'lucide-react'
 import { drawWinner } from '@/app/[locale]/admin/actions'
 import { fmtNumber, fmtDateTime } from '@/lib/format'
@@ -23,6 +23,8 @@ const ANIM_DURATION = 3000 // ms
 
 export function DrawWinnerClient({ competition, tickets, existingWinner }: Props) {
   const t = useTranslations('admin')
+  const tCommon = useTranslations('common')
+  const locale = useLocale()
   const [winner, setWinner] = useState(existingWinner)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -68,7 +70,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
     }, 60)
 
     // Run server action in parallel
-    const result = await drawWinner(competition.id)
+    const result = await drawWinner(competition.id, locale)
 
     // Wait for animation to finish if not done yet
     const remaining = ANIM_DURATION - (Date.now() - startTime)
@@ -98,7 +100,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
           <div className="mx-4 w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
             <div className="flex items-start justify-between">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                Confirm Draw
+                {t('confirmDraw')}
               </h3>
               <button
                 onClick={() => setShowConfirm(false)}
@@ -108,27 +110,25 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
               </button>
             </div>
             <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
-              Are you sure you want to draw a winner for{' '}
-              <strong className="text-slate-900 dark:text-slate-100">
-                {competition.title}
-              </strong>
-              ? This action cannot be undone.
+              {t('drawConfirmText', { title: competition.title })}
             </p>
             <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-              {tickets.length} ticket{tickets.length !== 1 ? 's' : ''} in the pool.
+              {tickets.length === 1
+                ? t('poolCount', { count: tickets.length })
+                : t('poolCountPlural', { count: tickets.length })}
             </p>
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => setShowConfirm(false)}
                 className="flex-1 rounded-xl border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300"
               >
-                Cancel
+                {tCommon('cancel')}
               </button>
               <button
                 onClick={handleConfirmedDraw}
                 className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
               >
-                Draw Winner
+                {t('drawWinner')}
               </button>
             </div>
           </div>
@@ -140,12 +140,17 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
         <dl className="divide-y divide-slate-100 dark:divide-zinc-800">
           {[
             {
-              label: 'Prize',
+              label: t('fieldPrize'),
               value: `$${fmtNumber(competition.prize_amount)} ${competition.crypto_type}`,
             },
-            { label: 'Tickets sold', value: `${tickets.length} / ${competition.max_tickets}` },
-            { label: 'Status', value: competition.status },
-            { label: 'End date', value: fmtDateTime(competition.end_date) },
+            { label: t('fieldTicketsSold'), value: `${tickets.length} / ${competition.max_tickets}` },
+            {
+              label: t('fieldStatus'),
+              value: t(
+                `status${competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}` as 'statusActive',
+              ),
+            },
+            { label: t('fieldEndDateLabel'), value: fmtDateTime(competition.end_date) },
           ].map(({ label, value }) => (
             <div key={label} className="flex items-center justify-between py-3">
               <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
@@ -159,7 +164,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
       {tickets.length > 0 && (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Ticket pool ({tickets.length})
+            {t('ticketPool', { count: tickets.length })}
           </p>
           <div className="max-h-48 overflow-y-auto">
             <div className="flex flex-wrap gap-1.5">
@@ -193,7 +198,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
           <div className="flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-indigo-600 dark:text-indigo-400" />
             <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-              Drawing winner… {animProgress}%
+              {t('drawingWinner', { percent: animProgress })}
             </p>
           </div>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-indigo-200 dark:bg-indigo-900">
@@ -229,7 +234,7 @@ export function DrawWinnerClient({ competition, tickets, existingWinner }: Props
             </div>
           </dl>
           <p className="mt-3 text-xs text-green-600 dark:text-green-500">
-            Winner email sent · Competition marked as completed
+            {t('winnerEmailSent')}
           </p>
         </div>
       ) : !loading ? (

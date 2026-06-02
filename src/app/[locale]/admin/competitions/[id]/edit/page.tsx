@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { CompetitionForm } from '@/components/admin/CompetitionForm'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -44,7 +45,9 @@ export default async function EditCompetitionPage({ params }: PageProps) {
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
           {t('editCompetition')}
         </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{competition.title}</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          {localizeCompetition(competition, locale).title}
+        </p>
       </div>
 
       <div className="mt-6 max-w-2xl">

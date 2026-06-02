@@ -85,6 +85,7 @@
     "noWinnersYet": "No winners yet — be the first!",
     "winnerToday": "Today",
     "winnerDaysAgo": "{days}d ago",
+    "winnerTicketLine": "{title} · Ticket #{number}",
     "currentCompetitions": "Current Competitions"
   },
   "competitions": {
@@ -149,6 +150,9 @@
     "cryptoPriceLabel": "{crypto} price"
   },
   "checkout": {
+    "metaTitle": "Purchase Successful — WinuWallet",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorNetwork": "Could not connect. Please check your connection and try again.",
     "successTitle": "You're in!",
     "successDesc": "Your payment was confirmed. Tickets are being generated and will appear in your dashboard shortly.",
     "orderSummary": "Order Summary",
@@ -179,7 +183,10 @@
     "ticketNumber": "Ticket #",
     "date": "Date",
     "competition": "Competition",
-    "status": "Status"
+    "status": "Status",
+    "youWonBanner": "You won {amount} USD in {crypto}!",
+    "winningTicketLine": "{title} · Winning ticket",
+    "viewLink": "View →"
   },
   "admin": {
     "title": "Admin Panel",
@@ -202,7 +209,12 @@
     "recentActivity": "Recent Activity",
     "noActivity": "No recent activity to display.",
     "fieldTitle": "Title",
+    "fieldTitleFr": "Title (French)",
+    "fieldTitleEn": "Title (English)",
+    "fieldTitleHint": "At least one language must be filled in.",
     "fieldDescription": "Description",
+    "fieldDescriptionFr": "Description (French)",
+    "fieldDescriptionEn": "Description (English)",
     "fieldPrizeAmount": "Prize Amount (USD)",
     "fieldCryptoType": "Cryptocurrency",
     "fieldTicketPrice": "Ticket Price (USD)",
@@ -261,8 +273,52 @@
     "filterPending": "Pending",
     "filterCompleted": "Completed",
     "filterFailed": "Failed",
+    "filterRefunded": "Refunded",
     "noData": "No data to display.",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "subtitle": "Platform overview and management",
+    "countTotal": "total",
+    "countMatching": "matching \"{query}\"",
+    "draft": "Draft",
+    "draftBadge": "Draft",
+    "confirmDraw": "Confirm Draw",
+    "drawConfirmText": "Are you sure you want to draw a winner for {title}? This action cannot be undone.",
+    "poolCount": "{count} ticket in the pool.",
+    "poolCountPlural": "{count} tickets in the pool.",
+    "fieldPrize": "Prize",
+    "fieldTicketsSold": "Tickets sold",
+    "fieldEndDateLabel": "End date",
+    "ticketPool": "Ticket pool ({count})",
+    "drawingWinner": "Drawing winner… {percent}%",
+    "winnerEmailSent": "Winner email sent · Competition marked as completed",
+    "errors": {
+      "titleRequired": "Title is required.",
+      "prizeAmountInvalid": "Prize amount must be greater than 0.",
+      "cryptoTypeRequired": "Cryptocurrency is required.",
+      "ticketPriceInvalid": "Ticket price must be greater than 0.",
+      "maxTicketsInvalid": "Maximum tickets must be at least 1.",
+      "endDateRequired": "End date is required.",
+      "endDateInPast": "End date must be in the future.",
+      "invalidStatus": "Invalid status.",
+      "viabilityError": "Viability error: max revenue ({maxTickets} × ${ticketPrice} = ${maxRevenue}) is less than prize amount (${prizeAmount}). Increase ticket price or max tickets.",
+      "unauthorized": "Unauthorized.",
+      "competitionNotFound": "Competition not found.",
+      "winnerAlreadyDrawn": "Winner already drawn.",
+      "notEligibleForDraw": "Competition is not yet eligible for a draw.",
+      "noTicketsForCompetition": "No tickets found for this competition.",
+      "missingUserId": "Missing user ID.",
+      "invalidRole": "Invalid role.",
+      "databaseError": "Database error: {message}",
+      "saveWinnerFailed": "Failed to save winner: {message}",
+      "errorWithMessage": "Error: {message}"
+    },
+    "recent": {
+      "colUser": "User",
+      "colCompetition": "Competition",
+      "colAmount": "Amount",
+      "colTickets": "Tickets",
+      "colDate": "Date"
+    }
   },
   "footer": {
     "tagline": "Win Your Wallet.",
@@ -406,5 +462,49 @@
     "s11Title": "11. Contact",
     "s11Text": "For questions about these Terms, contact us at legal@winuwallet.com.",
     "backHome": "Back to Home"
+  },
+  "emails": {
+    "welcome": {
+      "subject": "Welcome to WinuWallet 🎉",
+      "heading": "Welcome to WinuWallet!",
+      "subtitle": "You're now part of the fairest crypto prize platform on the web. Here's how it works:",
+      "step1Label": "① Choose a Competition",
+      "step1Value": "Browse live prizes",
+      "step2Label": "② Buy Tickets",
+      "step2Value": "Secure card payment",
+      "step3Label": "③ Win Crypto",
+      "step3Value": "Provably fair draws",
+      "trustNote": "Every draw uses cryptographic randomness that is publicly verifiable. No hidden tricks — just fair competition.",
+      "cta": "Browse Competitions →",
+      "footer": "You signed up with {email}. If this wasn't you, you can safely ignore this email."
+    },
+    "purchase": {
+      "subjectSingle": "Your ticket for {title}",
+      "subjectMultiple": "Your tickets for {title}",
+      "heading": "You're entered! 🎟️",
+      "subtitle": "Your payment was confirmed and your tickets are ready. Good luck!",
+      "labelCompetition": "Competition",
+      "labelTickets": "Tickets purchased",
+      "labelTotalPaid": "Total paid",
+      "ticketsCountSingle": "{count} ticket",
+      "ticketsCountPlural": "{count} tickets",
+      "yourTicketNumbers": "Your ticket numbers:",
+      "cta": "View Competition →",
+      "footer": "Confirmation sent to {email}. Keep this email as your receipt."
+    },
+    "winner": {
+      "subject": "🏆 You won {amount} USD in {crypto}!",
+      "heading": "Congratulations! You won! 🏆",
+      "subtitle": "Your ticket was drawn as the winner for {title}. Here are your winnings:",
+      "winPrize": "{amount} USD in {crypto}",
+      "winTicket": "Winning ticket: #{number}",
+      "labelCompetition": "Competition",
+      "labelPrize": "Prize",
+      "labelWinningTicket": "Winning Ticket",
+      "claimTitle": "How to claim your prize:",
+      "claimText": "Our team will contact you within 48 hours to verify your identity and arrange the prize transfer. Please ensure your wallet address is up to date in your account settings. Do not share your winning confirmation with anyone.",
+      "cta": "Go to My Dashboard →",
+      "footer": "This email was sent to {email}. If you have questions, reply to this email."
+    }
   }
 }

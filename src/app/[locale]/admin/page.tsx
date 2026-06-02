@@ -5,6 +5,7 @@ import { Users, Trophy, DollarSign, Ticket, Plus, Users2, CreditCard } from 'luc
 import { createAdminClient } from '@/lib/supabase/admin'
 import { StatsCard } from '@/components/ui/StatsCard'
 import { fmtUSD, fmtDate } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -34,7 +35,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
     admin.from('payments').select('amount').eq('status', 'completed'),
     admin
       .from('payments')
-      .select('id, amount, ticket_count, status, created_at, users(email), competitions(title)')
+      .select('id, amount, ticket_count, status, created_at, users(email), competitions(title, title_fr, title_en)')
       .order('created_at', { ascending: false })
       .limit(10),
   ])
@@ -46,7 +47,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('title')}</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Platform overview and management
+          {t('subtitle')}
         </p>
       </div>
 
@@ -113,7 +114,13 @@ export default async function AdminPage({ params }: AdminPageProps) {
         {recentPayments && recentPayments.length > 0 ? (
           <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div className="grid grid-cols-5 border-b border-slate-100 px-5 py-3 dark:border-zinc-800">
-              {['User', 'Competition', 'Amount', 'Tickets', 'Date'].map((h) => (
+              {[
+                t('recent.colUser'),
+                t('recent.colCompetition'),
+                t('recent.colAmount'),
+                t('recent.colTickets'),
+                t('recent.colDate'),
+              ].map((h) => (
                 <span key={h} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   {h}
                 </span>
@@ -121,7 +128,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
             </div>
             {recentPayments.map((p) => {
               const users = (p.users as unknown as { email: string }[] | null)?.[0] ?? null
-              const competitions = (p.competitions as unknown as { title: string }[] | null)?.[0] ?? null
+              const compRaw = (p.competitions as unknown as { title: string; title_fr: string | null; title_en: string | null }[] | null)?.[0] ?? null
+              const competitionTitle = compRaw ? localizeCompetition(compRaw, locale).title : null
               return (
                 <div
                   key={p.id}
@@ -131,7 +139,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
                     {users?.email ?? '—'}
                   </span>
                   <span className="truncate text-sm text-slate-600 dark:text-slate-400">
-                    {competitions?.title ?? '—'}
+                    {competitionTitle ?? '—'}
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     ${p.amount?.toFixed(2)}

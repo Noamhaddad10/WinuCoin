@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStripe } from '@/lib/stripe'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 // ── In-memory rate limiter ──────────────────────────────────────────────────
 // TODO: Replace with distributed rate limiting (Upstash Redis / Vercel KV)
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
   const [{ data: competition, error: compError }, { data: publicUser }] = await Promise.all([
     admin
       .from('competitions')
-      .select('id, slug, title, ticket_price, max_tickets, tickets_sold, status, crypto_type')
+      .select('id, slug, title, title_fr, title_en, ticket_price, max_tickets, tickets_sold, status, crypto_type')
       .eq('id', competition_id)
       .single(),
     admin
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${count} ticket${count > 1 ? 's' : ''} — ${competition.title}`,
+            name: `${count} ticket${count > 1 ? 's' : ''} — ${localizeCompetition(competition, locale).title}`,
             description: `${competition.crypto_type} Prize Competition on WinuWallet`,
           },
           unit_amount: Math.round(competition.ticket_price * 100), // cents
@@ -129,6 +130,7 @@ export async function POST(request: NextRequest) {
       ticket_count: String(count),
       user_id: user.id,          // auth user id — used for tickets.user_id
       public_user_id: publicUser.id, // public.users.id — used for payments.user_id
+      locale,
     },
   })
 

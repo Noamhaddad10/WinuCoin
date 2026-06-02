@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { updateUserRole } from '@/app/[locale]/admin/actions'
 
 interface UserRoleFormProps {
@@ -11,7 +11,9 @@ interface UserRoleFormProps {
 
 export function UserRoleForm({ userId, currentRole }: UserRoleFormProps) {
   const t = useTranslations('admin')
-  const [, formAction, isPending] = useActionState(updateUserRole, '')
+  const locale = useLocale()
+  const action = updateUserRole.bind(null, locale)
+  const [, formAction, isPending] = useActionState(action, '')
 
   return (
     <form action={formAction} className="flex items-center gap-2">

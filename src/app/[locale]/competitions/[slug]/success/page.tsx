@@ -7,8 +7,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { createClient } from '@/lib/supabase/server'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
-export const metadata: Metadata = { title: 'Purchase Successful' }
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('checkout')
+  return { title: t('metaTitle') }
+}
 
 interface SuccessPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -41,8 +45,8 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
   // Look up the competition — try slug, fall back to UUID
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
   const { data: competition } = isUuid
-    ? await admin.from('competitions').select('title, crypto_type, prize_amount').eq('id', slug).maybeSingle()
-    : await admin.from('competitions').select('title, crypto_type, prize_amount').eq('slug', slug).maybeSingle()
+    ? await admin.from('competitions').select('title, title_fr, title_en, crypto_type, prize_amount').eq('id', slug).maybeSingle()
+    : await admin.from('competitions').select('title, title_fr, title_en, crypto_type, prize_amount').eq('slug', slug).maybeSingle()
 
   // Look up tickets (may not exist yet if webhook hasn't fired)
   const { data: tickets } = payment
@@ -87,7 +91,7 @@ export default async function SuccessPage({ params, searchParams }: SuccessPageP
                     {t('competition')}
                   </span>
                   <span className="font-medium text-slate-900 dark:text-slate-100">
-                    {competition?.title ?? '—'}
+                    {competition ? localizeCompetition(competition, locale).title : '—'}
                   </span>
                 </div>
 

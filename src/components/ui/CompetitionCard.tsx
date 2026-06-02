@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { CardCountdownTimer } from './CardCountdownTimer'
 import { getCryptoImageUrl, CryptoIcon } from './CryptoIcons'
 import { fmtNumber } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 import type { Competition } from '@/types'
 
 interface CompetitionCardProps {
@@ -46,6 +47,7 @@ const DEFAULT_PROGRESS = 'from-indigo-200 to-purple-200'
 
 export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
   const t = useTranslations('competitions')
+  const localized = localizeCompetition(competition, locale)
 
   const now = new Date()
   const isExpired = new Date(competition.end_date) <= now
@@ -126,12 +128,12 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
       {/* Body */}
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
-          {competition.title}
+          {localized.title}
         </h3>
         <div className="mt-0.5 h-10">
-          {competition.description && (
+          {localized.description && (
             <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
-              {competition.description}
+              {localized.description}
             </p>
           )}
         </div>

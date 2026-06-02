@@ -1,10 +1,16 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { randomInt } from 'crypto'
 import { sendWinnerAnnouncement } from '@/lib/email'
+import { localizeCompetition } from '@/lib/competition-i18n'
+
+async function tErrors(locale: string) {
+  return getTranslations({ locale, namespace: 'admin.errors' })
+}
 
 // ── Auth guard ─────────────────────────────────────────────────────────────
 async function requireAdmin() {
@@ -24,26 +30,32 @@ async function requireAdmin() {
 // ── Create competition ──────────────────────────────────────────────────────
 export async function createCompetition(locale: string, _prevState: string, formData: FormData) {
   await requireAdmin()
+  const t = await tErrors(locale)
 
-  const title = formData.get('title') as string
-  const description = formData.get('description') as string
+  const title_fr = ((formData.get('title_fr') as string) ?? '').trim() || null
+  const title_en = ((formData.get('title_en') as string) ?? '').trim() || null
+  const description_fr = ((formData.get('description_fr') as string) ?? '').trim() || null
+  const description_en = ((formData.get('description_en') as string) ?? '').trim() || null
+  // Canonical title used for slug + legacy `title` column.
+  const title = title_en ?? title_fr
+  const description = description_en ?? description_fr
   const prize_amount = Number(formData.get('prize_amount'))
   const crypto_type = formData.get('crypto_type') as string
   const ticket_price = Number(formData.get('ticket_price'))
   const max_tickets = Number(formData.get('max_tickets'))
   const end_date = formData.get('end_date') as string
 
-  if (!title?.trim()) return 'Title is required.'
-  if (!prize_amount || prize_amount <= 0) return 'Prize amount must be greater than 0.'
-  if (!crypto_type) return 'Cryptocurrency is required.'
-  if (!ticket_price || ticket_price <= 0) return 'Ticket price must be greater than 0.'
-  if (!max_tickets || max_tickets < 1) return 'Maximum tickets must be at least 1.'
-  if (!end_date) return 'End date is required.'
-  if (new Date(end_date) <= new Date()) return 'End date must be in the future.'
+  if (!title?.trim()) return t('titleRequired')
+  if (!prize_amount || prize_amount <= 0) return t('prizeAmountInvalid')
+  if (!crypto_type) return t('cryptoTypeRequired')
+  if (!ticket_price || ticket_price <= 0) return t('ticketPriceInvalid')
+  if (!max_tickets || max_tickets < 1) return t('maxTicketsInvalid')
+  if (!end_date) return t('endDateRequired')
+  if (new Date(end_date) <= new Date()) return t('endDateInPast')
 
   const maxRevenue = max_tickets * ticket_price
   if (maxRevenue < prize_amount) {
-    return `Viability error: max revenue (${max_tickets} × $${ticket_price} = $${maxRevenue}) is less than prize amount ($${prize_amount}). Increase ticket price or max tickets.`
+    return t('viabilityError', { maxTickets: max_tickets, ticketPrice: ticket_price, maxRevenue, prizeAmount: prize_amount })
   }
 
   const is_published = formData.get('is_published') === 'true'
@@ -74,8 +86,12 @@ export async function createCompetition(locale: string, _prevState: string, form
 
   const { error } = await admin.from('competitions').insert({
     title: title.trim(),
+    title_fr,
+    title_en,
     slug,
-    description: description?.trim() || null,
+    description: description ?? null,
+    description_fr,
+    description_en,
     prize_amount,
     crypto_type,
     ticket_price,
@@ -87,7 +103,7 @@ export async function createCompetition(locale: string, _prevState: string, form
     is_published,
   })
 
-  if (error) return `Database error: ${error.message}`
+  if (error) return t('databaseError', { message: error.message })
 
   redirect(`/${locale}/admin/competitions`)
 }
@@ -100,9 +116,14 @@ export async function updateCompetition(
   formData: FormData,
 ) {
   await requireAdmin()
+  const t = await tErrors(locale)
 
-  const title = formData.get('title') as string
-  const description = formData.get('description') as string
+  const title_fr = ((formData.get('title_fr') as string) ?? '').trim() || null
+  const title_en = ((formData.get('title_en') as string) ?? '').trim() || null
+  const description_fr = ((formData.get('description_fr') as string) ?? '').trim() || null
+  const description_en = ((formData.get('description_en') as string) ?? '').trim() || null
+  const title = title_en ?? title_fr
+  const description = description_en ?? description_fr
   const prize_amount = Number(formData.get('prize_amount'))
   const crypto_type = formData.get('crypto_type') as string
   const ticket_price = Number(formData.get('ticket_price'))
@@ -110,17 +131,17 @@ export async function updateCompetition(
   const end_date = formData.get('end_date') as string
   const status = formData.get('status') as string
 
-  if (!title?.trim()) return 'Title is required.'
-  if (!prize_amount || prize_amount <= 0) return 'Prize amount must be greater than 0.'
-  if (!crypto_type) return 'Cryptocurrency is required.'
-  if (!ticket_price || ticket_price <= 0) return 'Ticket price must be greater than 0.'
-  if (!max_tickets || max_tickets < 1) return 'Maximum tickets must be at least 1.'
-  if (!end_date) return 'End date is required.'
-  if (!['active', 'completed', 'cancelled'].includes(status)) return 'Invalid status.'
+  if (!title?.trim()) return t('titleRequired')
+  if (!prize_amount || prize_amount <= 0) return t('prizeAmountInvalid')
+  if (!crypto_type) return t('cryptoTypeRequired')
+  if (!ticket_price || ticket_price <= 0) return t('ticketPriceInvalid')
+  if (!max_tickets || max_tickets < 1) return t('maxTicketsInvalid')
+  if (!end_date) return t('endDateRequired')
+  if (!['active', 'completed', 'cancelled'].includes(status)) return t('invalidStatus')
 
   const maxRevenue = max_tickets * ticket_price
   if (maxRevenue < prize_amount) {
-    return `Viability error: max revenue (${max_tickets} × $${ticket_price} = $${maxRevenue}) is less than prize amount ($${prize_amount}). Increase ticket price or max tickets.`
+    return t('viabilityError', { maxTickets: max_tickets, ticketPrice: ticket_price, maxRevenue, prizeAmount: prize_amount })
   }
 
   const is_published = formData.get('is_published') === 'true'
@@ -130,7 +151,11 @@ export async function updateCompetition(
     .from('competitions')
     .update({
       title: title.trim(),
-      description: description?.trim() || null,
+      title_fr,
+      title_en,
+      description: description ?? null,
+      description_fr,
+      description_en,
       prize_amount,
       crypto_type,
       ticket_price,
@@ -141,19 +166,23 @@ export async function updateCompetition(
     })
     .eq('id', id)
 
-  if (error) return `Database error: ${error.message}`
+  if (error) return t('databaseError', { message: error.message })
 
   redirect(`/${locale}/admin/competitions`)
 }
 
 // ── Draw winner ─────────────────────────────────────────────────────────────
-export async function drawWinner(competitionId: string): Promise<
+export async function drawWinner(
+  competitionId: string,
+  locale: string,
+): Promise<
   { ok: true; ticketNumber: number; userEmail: string } | { ok: false; error: string }
 > {
+  const t = await tErrors(locale)
   try {
     await requireAdmin()
   } catch {
-    return { ok: false, error: 'Unauthorized' }
+    return { ok: false, error: t('unauthorized') }
   }
 
   const admin = createAdminClient()
@@ -165,12 +194,12 @@ export async function drawWinner(competitionId: string): Promise<
     .eq('id', competitionId)
     .single()
 
-  if (!competition) return { ok: false, error: 'Competition not found.' }
-  if (competition.winner_drawn) return { ok: false, error: 'Winner already drawn.' }
+  if (!competition) return { ok: false, error: t('competitionNotFound') }
+  if (competition.winner_drawn) return { ok: false, error: t('winnerAlreadyDrawn') }
 
   const isEnded =
     competition.status === 'completed' || new Date(competition.end_date) <= new Date()
-  if (!isEnded) return { ok: false, error: 'Competition is not yet eligible for a draw.' }
+  if (!isEnded) return { ok: false, error: t('notEligibleForDraw') }
 
   // Get all tickets
   const { data: tickets } = await admin
@@ -180,7 +209,7 @@ export async function drawWinner(competitionId: string): Promise<
     .order('ticket_number')
 
   if (!tickets || tickets.length === 0) {
-    return { ok: false, error: 'No tickets found for this competition.' }
+    return { ok: false, error: t('noTicketsForCompetition') }
   }
 
   // Cryptographically secure random pick
@@ -202,12 +231,12 @@ export async function drawWinner(competitionId: string): Promise<
     announced: true,
   })
 
-  if (winnerError) return { ok: false, error: `Failed to save winner: ${winnerError.message}` }
+  if (winnerError) return { ok: false, error: t('saveWinnerFailed', { message: winnerError.message }) }
 
   // Mark competition winner_drawn
   const { data: compData } = await admin
     .from('competitions')
-    .select('title, prize_amount, crypto_type')
+    .select('title, title_fr, title_en, prize_amount, crypto_type')
     .eq('id', competitionId)
     .single()
 
@@ -220,10 +249,11 @@ export async function drawWinner(competitionId: string): Promise<
   if (winnerUser?.email && compData) {
     sendWinnerAnnouncement({
       email: winnerUser.email,
-      competitionTitle: compData.title,
+      competitionTitle: localizeCompetition(compData, locale).title,
       prizeAmount: compData.prize_amount,
       cryptoType: compData.crypto_type,
       winningTicketNumber: winningTicket.ticket_number,
+      locale,
     }).catch(console.error)
   }
 
@@ -236,20 +266,22 @@ export async function drawWinner(competitionId: string): Promise<
 
 // ── Update user role ─────────────────────────────────────────────────────────
 export async function updateUserRole(
+  locale: string,
   _prevState: string,
   formData: FormData,
 ): Promise<string> {
   await requireAdmin()
+  const t = await tErrors(locale)
 
   const userId = formData.get('user_id') as string
   const role = formData.get('role') as string
 
-  if (!userId) return 'Missing user ID.'
-  if (!['user', 'admin'].includes(role)) return 'Invalid role.'
+  if (!userId) return t('missingUserId')
+  if (!['user', 'admin'].includes(role)) return t('invalidRole')
 
   const admin = createAdminClient()
   const { error } = await admin.from('users').update({ role }).eq('id', userId)
 
-  if (error) return `Error: ${error.message}`
+  if (error) return t('errorWithMessage', { message: error.message })
   return ''
 }

@@ -21,27 +21,35 @@ describe('baseTemplate', () => {
 })
 
 describe('welcomeEmail', () => {
-  it('returns subject and html', () => {
-    const { subject, html } = welcomeEmail('user@example.com')
+  it('returns subject and html in English', async () => {
+    const { subject, html } = await welcomeEmail('user@example.com', 'en')
     expect(subject).toContain('Welcome')
     expect(html).toContain('user@example.com')
   })
 
-  it('includes welcome message', () => {
-    const { html } = welcomeEmail('user@example.com')
+  it('returns subject and html in French', async () => {
+    const { subject, html } = await welcomeEmail('user@example.com', 'fr')
+    expect(subject).toContain('Bienvenue')
+    expect(html).toContain('user@example.com')
+  })
+
+  it('includes welcome message in English', async () => {
+    const { html } = await welcomeEmail('user@example.com', 'en')
     expect(html).toContain('Welcome to WinuWallet')
   })
 
-  it('includes how-it-works steps', () => {
-    const { html } = welcomeEmail('user@example.com')
+  it('includes how-it-works steps in English', async () => {
+    const { html } = await welcomeEmail('user@example.com', 'en')
     expect(html).toContain('Choose a Competition')
     expect(html).toContain('Buy Tickets')
     expect(html).toContain('Win Crypto')
   })
 
-  it('includes competitions link', () => {
-    const { html } = welcomeEmail('user@example.com')
+  it('includes competitions link with locale prefix', async () => {
+    const { html } = await welcomeEmail('user@example.com', 'en')
     expect(html).toContain('/en/competitions')
+    const fr = await welcomeEmail('user@example.com', 'fr')
+    expect(fr.html).toContain('/fr/competitions')
   })
 })
 
@@ -53,40 +61,47 @@ describe('purchaseConfirmationEmail', () => {
     ticketCount: 3,
     ticketNumbers: [42, 43, 44],
     totalPaid: 30,
+    locale: 'en',
   }
 
-  it('returns subject with ticket count', () => {
-    const { subject } = purchaseConfirmationEmail(opts)
+  it('returns subject with ticket count', async () => {
+    const { subject } = await purchaseConfirmationEmail(opts)
     expect(subject).toContain('tickets')
     expect(subject).toContain('Win 1 BTC')
   })
 
-  it('uses singular "ticket" for count of 1', () => {
-    const { subject } = purchaseConfirmationEmail({ ...opts, ticketCount: 1, ticketNumbers: [42] })
+  it('uses singular "ticket" for count of 1', async () => {
+    const { subject } = await purchaseConfirmationEmail({ ...opts, ticketCount: 1, ticketNumbers: [42] })
     expect(subject).toContain('ticket')
     expect(subject).not.toContain('tickets')
   })
 
-  it('includes ticket numbers in HTML', () => {
-    const { html } = purchaseConfirmationEmail(opts)
+  it('includes ticket numbers in HTML', async () => {
+    const { html } = await purchaseConfirmationEmail(opts)
     expect(html).toContain('#42')
     expect(html).toContain('#43')
     expect(html).toContain('#44')
   })
 
-  it('includes total paid amount', () => {
-    const { html } = purchaseConfirmationEmail(opts)
+  it('includes total paid amount', async () => {
+    const { html } = await purchaseConfirmationEmail(opts)
     expect(html).toContain('$30.00')
   })
 
-  it('includes competition title', () => {
-    const { html } = purchaseConfirmationEmail(opts)
+  it('includes competition title', async () => {
+    const { html } = await purchaseConfirmationEmail(opts)
     expect(html).toContain('Win 1 BTC')
   })
 
-  it('includes buyer email', () => {
-    const { html } = purchaseConfirmationEmail(opts)
+  it('includes buyer email', async () => {
+    const { html } = await purchaseConfirmationEmail(opts)
     expect(html).toContain('buyer@example.com')
+  })
+
+  it('localizes subject in French', async () => {
+    const { subject } = await purchaseConfirmationEmail({ ...opts, locale: 'fr' })
+    expect(subject).toContain('tickets')
+    expect(subject.toLowerCase()).toContain('win 1 btc')
   })
 })
 
@@ -97,42 +112,45 @@ describe('winnerAnnouncementEmail', () => {
     prizeAmount: 35000,
     cryptoType: 'ETH',
     winningTicketNumber: 777,
+    locale: 'en',
   }
 
-  it('returns subject with prize details', () => {
-    const { subject } = winnerAnnouncementEmail(opts)
+  it('returns subject with prize details', async () => {
+    const { subject } = await winnerAnnouncementEmail(opts)
     expect(subject).toContain('35,000')
     expect(subject).toContain('ETH')
   })
 
-  it('includes winning ticket number', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes winning ticket number', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('#777')
   })
 
-  it('includes prize amount formatted', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes prize amount formatted', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('35,000')
   })
 
-  it('includes competition title', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes competition title', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('Win 10 ETH')
   })
 
-  it('includes claim instructions', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes claim instructions', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('48 hours')
     expect(html).toContain('wallet address')
   })
 
-  it('includes dashboard link', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes dashboard link with locale', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('/en/dashboard')
+    const fr = await winnerAnnouncementEmail({ ...opts, locale: 'fr' })
+    expect(fr.html).toContain('/fr/dashboard')
   })
 
-  it('includes winner email', () => {
-    const { html } = winnerAnnouncementEmail(opts)
+  it('includes winner email', async () => {
+    const { html } = await winnerAnnouncementEmail(opts)
     expect(html).toContain('winner@example.com')
   })
 })

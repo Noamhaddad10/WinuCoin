@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fmtDate } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -36,7 +37,7 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
 
   let query = admin
     .from('payments')
-    .select('id, amount, ticket_count, status, payment_method, created_at, users(email), competitions(title)')
+    .select('id, amount, ticket_count, status, payment_method, created_at, users(email), competitions(title, title_fr, title_en)')
     .order('created_at', { ascending: false })
     .limit(100)
 
@@ -56,7 +57,10 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('allPayments')}</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {filtered.length} {validStatus ? validStatus : 'total'}
+          {filtered.length}{' '}
+          {validStatus
+            ? t(`filter${validStatus.charAt(0).toUpperCase() + validStatus.slice(1)}` as 'filterAll')
+            : t('countTotal')}
         </p>
       </div>
 
@@ -108,7 +112,8 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
         {filtered.length > 0 ? (
           filtered.map((p) => {
             const user = (p.users as unknown as { email: string }[] | null)?.[0] ?? null
-            const comp = (p.competitions as unknown as { title: string }[] | null)?.[0] ?? null
+            const compRaw = (p.competitions as unknown as { title: string; title_fr: string | null; title_en: string | null }[] | null)?.[0] ?? null
+            const compTitle = compRaw ? localizeCompetition(compRaw, locale).title : null
             return (
               <div
                 key={p.id}
@@ -118,7 +123,7 @@ export default async function AdminPaymentsPage({ params, searchParams }: PagePr
                   {user?.email ?? '—'}
                 </span>
                 <span className="truncate text-sm text-slate-600 dark:text-slate-400">
-                  {comp?.title ?? '—'}
+                  {compTitle ?? '—'}
                 </span>
                 <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                   ${p.amount?.toFixed(2)}

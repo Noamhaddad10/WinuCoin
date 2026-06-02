@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       role: 'user',
     })
     if (user.email) {
-      sendWelcomeEmail(user.email).catch(console.error)
+      sendWelcomeEmail(user.email, locale).catch(console.error)
     }
   }
 

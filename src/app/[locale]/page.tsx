@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CompetitionCard } from '@/components/ui/CompetitionCard'
 import { PhoneMockup } from '@/components/ui/PhoneMockup'
+import { localizeCompetition } from '@/lib/competition-i18n'
 import type { Competition } from '@/types'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -50,7 +51,7 @@ export default async function HomePage({ params }: HomePageProps) {
       .limit(6),
     admin
       .from('winners')
-      .select('id, created_at, users(email), competitions(title, prize_amount, crypto_type), tickets(ticket_number)')
+      .select('id, created_at, users(email), competitions(title, title_fr, title_en, prize_amount, crypto_type), tickets(ticket_number)')
       .order('created_at', { ascending: false })
       .limit(6),
     supabase.from('competitions').select('*', { count: 'exact', head: true }),
@@ -355,7 +356,10 @@ export default async function HomePage({ params }: HomePageProps) {
               <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {realWinners.map((w) => {
                   const user = (w.users as unknown as { email: string }[] | null)?.[0] ?? null
-                  const comp = (w.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                  const compRaw = (w.competitions as unknown as { title: string; title_fr: string | null; title_en: string | null; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                  const comp = compRaw
+                    ? { ...compRaw, ...localizeCompetition(compRaw, locale) }
+                    : null
                   const ticket = (w.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
                   const daysAgo = winnerDaysAgo.get(w.id) ?? 0
                   return (
@@ -371,7 +375,10 @@ export default async function HomePage({ params }: HomePageProps) {
                           ${fmtNumber(comp?.prize_amount ?? 0)} {comp?.crypto_type}
                         </p>
                         <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                          {comp?.title} · Ticket #{ticket?.ticket_number}
+                          {t('winnerTicketLine', {
+                            title: comp?.title ?? '',
+                            number: ticket?.ticket_number ?? 0,
+                          })}
                         </p>
                       </div>
                       <span className="shrink-0 text-xs text-slate-400">

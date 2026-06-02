@@ -128,14 +128,14 @@ describe('admin route protections', () => {
     const content = fs.readFileSync(actionsFile, 'utf-8')
     // Must check maxRevenue >= prize_amount
     expect(content).toContain('maxRevenue')
-    expect(content).toContain('Viability error')
+    expect(content).toContain('viabilityError')
   })
 
   it('drawWinner checks competition eligibility', () => {
     const actionsFile = path.join(SRC_DIR, 'app/[locale]/admin/actions.ts')
     const content = fs.readFileSync(actionsFile, 'utf-8')
     expect(content).toContain('winner_drawn')
-    expect(content).toContain('Winner already drawn')
-    expect(content).toContain('not yet eligible')
+    expect(content).toContain('winnerAlreadyDrawn')
+    expect(content).toContain('notEligibleForDraw')
   })
 })

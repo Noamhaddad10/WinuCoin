@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStripe } from '@/lib/stripe'
 import { sendPurchaseConfirmation } from '@/lib/email'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -33,7 +34,14 @@ export async function POST(request: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
 
-    const { competition_id, ticket_count, user_id, public_user_id } = session.metadata ?? {}
+    const {
+      competition_id,
+      ticket_count,
+      user_id,
+      public_user_id,
+      locale: rawLocale,
+    } = session.metadata ?? {}
+    const locale = rawLocale === 'fr' || rawLocale === 'en' ? rawLocale : 'en'
 
     if (!competition_id || !ticket_count || !user_id) {
       console.error('[webhook] Missing metadata:', { competition_id, ticket_count, user_id })
@@ -81,7 +89,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Payment record not found and could not be created' }, { status: 500 })
       }
 
-      return await issueTickets(admin, newPayment.id, count, competition_id, resolvedPublicUserId)
+      return await issueTickets(admin, newPayment.id, count, competition_id, resolvedPublicUserId, locale)
     }
 
     // Happy path — payment record exists
@@ -101,7 +109,7 @@ export async function POST(request: NextRequest) {
       console.error('[webhook] Failed to update payment status:', updateError.message)
     }
 
-    return await issueTickets(admin, payment.id, count, competition_id, resolvedPublicUserId)
+    return await issueTickets(admin, payment.id, count, competition_id, resolvedPublicUserId, locale)
   }
 
   return NextResponse.json({ received: true })
@@ -131,6 +139,7 @@ async function issueTickets(
   count: number,
   competitionId: string,
   userId: string,
+  locale: string,
 ) {
   // Check if tickets already issued (idempotency)
   const { count: existingCount } = await admin
@@ -210,17 +219,18 @@ async function issueTickets(
   try {
     const [{ data: userRow }, { data: comp }] = await Promise.all([
       admin.from('users').select('email').eq('id', userId).single(),
-      admin.from('competitions').select('title, ticket_price').eq('id', competitionId).single(),
+      admin.from('competitions').select('title, title_fr, title_en, ticket_price').eq('id', competitionId).single(),
     ])
 
     if (userRow?.email && comp) {
       sendPurchaseConfirmation({
         email: userRow.email,
-        competitionTitle: comp.title,
+        competitionTitle: localizeCompetition(comp, locale).title,
         competitionId,
         ticketCount: count,
         ticketNumbers: tickets.map((t) => t.ticket_number),
         totalPaid: comp.ticket_price * count,
+        locale,
       }).catch(console.error)
     }
   } catch (err) {

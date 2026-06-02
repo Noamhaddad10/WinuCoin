@@ -28,8 +28,8 @@ async function send(to: string, subject: string, html: string): Promise<void> {
 
 // ── Public helpers ──────────────────────────────────────────────────────────
 
-export async function sendWelcomeEmail(email: string): Promise<void> {
-  const { subject, html } = welcomeEmail(email)
+export async function sendWelcomeEmail(email: string, locale: string): Promise<void> {
+  const { subject, html } = await welcomeEmail(email, locale)
   await send(email, subject, html)
 }
 
@@ -40,8 +40,9 @@ export async function sendPurchaseConfirmation(opts: {
   ticketCount: number
   ticketNumbers: number[]
   totalPaid: number
+  locale: string
 }): Promise<void> {
-  const { subject, html } = purchaseConfirmationEmail(opts)
+  const { subject, html } = await purchaseConfirmationEmail(opts)
   await send(opts.email, subject, html)
 }
 
@@ -51,7 +52,8 @@ export async function sendWinnerAnnouncement(opts: {
   prizeAmount: number
   cryptoType: string
   winningTicketNumber: number
+  locale: string
 }): Promise<void> {
-  const { subject, html } = winnerAnnouncementEmail(opts)
+  const { subject, html } = await winnerAnnouncementEmail(opts)
   await send(opts.email, subject, html)
 }

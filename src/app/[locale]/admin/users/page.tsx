@@ -58,7 +58,7 @@ export default async function AdminUsersPage({ params, searchParams }: PageProps
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('allUsers')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {users?.length ?? 0} {q ? `matching "${q}"` : 'total'}
+            {users?.length ?? 0} {q ? t('countMatching', { query: q }) : t('countTotal')}
           </p>
         </div>
       </div>

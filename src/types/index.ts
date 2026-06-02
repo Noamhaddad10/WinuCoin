@@ -16,7 +16,11 @@ export interface Competition {
   id: string
   slug?: string
   title: string
-  description?: string
+  title_fr?: string | null
+  title_en?: string | null
+  description?: string | null
+  description_fr?: string | null
+  description_en?: string | null
   prize_amount: number
   crypto_type: string
   crypto_price_usd?: number

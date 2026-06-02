@@ -12,6 +12,7 @@ import Image from 'next/image'
 import { CryptoIcon, getCryptoImageUrl } from '@/components/ui/CryptoIcons'
 import { getCryptoPrices, cryptoAmount } from '@/lib/coingecko'
 import { fmtNumber, fmtDateTime } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 interface CompetitionDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -60,10 +61,11 @@ async function findCompetition(supabase: Awaited<ReturnType<typeof createClient>
 export async function generateMetadata({
   params,
 }: CompetitionDetailPageProps): Promise<Metadata> {
-  const { slug } = await params
+  const { locale, slug } = await params
   const supabase = await createClient()
   const competition = await findCompetition(supabase, slug)
-  return { title: competition?.title ?? 'Competition' }
+  const t = await getTranslations({ locale, namespace: 'competitions' })
+  return { title: competition ? localizeCompetition(competition, locale).title : t('title') }
 }
 
 export default async function CompetitionDetailPage({
@@ -86,6 +88,8 @@ export default async function CompetitionDetailPage({
   ])
 
   if (!competition) notFound()
+
+  const localized = localizeCompetition(competition, locale)
 
   // Look up public user id (tickets.user_id FK references public.users.id, not auth.users.id)
   const publicUserId = user
@@ -208,7 +212,7 @@ export default async function CompetitionDetailPage({
               </div>
 
               <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-                {competition.title}
+                {localized.title}
               </h1>
 
               {/* Prize — USD primary */}
@@ -302,13 +306,13 @@ export default async function CompetitionDetailPage({
               )}
 
               {/* About */}
-              {competition.description && (
+              {localized.description && (
                 <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
                   <h2 className="font-semibold text-slate-900 dark:text-slate-100">
                     {t('aboutCompetition')}
                   </h2>
                   <p className="mt-3 leading-relaxed text-slate-600 dark:text-slate-400">
-                    {competition.description}
+                    {localized.description}
                   </p>
                 </section>
               )}

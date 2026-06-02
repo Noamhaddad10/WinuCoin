@@ -85,6 +85,7 @@
     "noWinnersYet": "Pas encore de gagnants — soyez le premier !",
     "winnerToday": "Aujourd'hui",
     "winnerDaysAgo": "Il y a {days}j",
+    "winnerTicketLine": "{title} · Ticket n°{number}",
     "currentCompetitions": "Compétitions en cours"
   },
   "competitions": {
@@ -149,6 +150,9 @@
     "cryptoPriceLabel": "Prix du {crypto}"
   },
   "checkout": {
+    "metaTitle": "Achat confirmé — WinuWallet",
+    "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+    "errorNetwork": "Connexion impossible. Vérifiez votre connexion et réessayez.",
     "successTitle": "Vous êtes inscrit !",
     "successDesc": "Votre paiement a été confirmé. Les tickets sont générés et apparaîtront bientôt dans votre tableau de bord.",
     "orderSummary": "Récapitulatif de commande",
@@ -179,7 +183,10 @@
     "ticketNumber": "Ticket n°",
     "date": "Date",
     "competition": "Compétition",
-    "status": "Statut"
+    "status": "Statut",
+    "youWonBanner": "Vous avez gagné {amount} USD en {crypto} !",
+    "winningTicketLine": "{title} · Ticket gagnant",
+    "viewLink": "Voir →"
   },
   "admin": {
     "title": "Panneau d'administration",
@@ -202,7 +209,12 @@
     "recentActivity": "Activité récente",
     "noActivity": "Aucune activité récente à afficher.",
     "fieldTitle": "Titre",
+    "fieldTitleFr": "Titre (français)",
+    "fieldTitleEn": "Titre (anglais)",
+    "fieldTitleHint": "Au moins une langue doit être renseignée.",
     "fieldDescription": "Description",
+    "fieldDescriptionFr": "Description (français)",
+    "fieldDescriptionEn": "Description (anglais)",
     "fieldPrizeAmount": "Montant du prix (USD)",
     "fieldCryptoType": "Cryptomonnaie",
     "fieldTicketPrice": "Prix du ticket (USD)",
@@ -261,8 +273,52 @@
     "filterPending": "En attente",
     "filterCompleted": "Complétés",
     "filterFailed": "Échoués",
+    "filterRefunded": "Remboursés",
     "noData": "Aucune donnée à afficher.",
-    "comingSoon": "Bientôt disponible"
+    "comingSoon": "Bientôt disponible",
+    "subtitle": "Vue d'ensemble et gestion de la plateforme",
+    "countTotal": "total",
+    "countMatching": "correspondant à « {query} »",
+    "draft": "Brouillon",
+    "draftBadge": "Brouillon",
+    "confirmDraw": "Confirmer le tirage",
+    "drawConfirmText": "Voulez-vous vraiment tirer un gagnant pour {title} ? Cette action est irréversible.",
+    "poolCount": "{count} ticket dans la pool.",
+    "poolCountPlural": "{count} tickets dans la pool.",
+    "fieldPrize": "Prix",
+    "fieldTicketsSold": "Tickets vendus",
+    "fieldEndDateLabel": "Date de fin",
+    "ticketPool": "Pool de tickets ({count})",
+    "drawingWinner": "Tirage du gagnant… {percent}%",
+    "winnerEmailSent": "Email envoyé au gagnant · Compétition marquée comme terminée",
+    "errors": {
+      "titleRequired": "Le titre est requis.",
+      "prizeAmountInvalid": "Le montant du prix doit être supérieur à 0.",
+      "cryptoTypeRequired": "La cryptomonnaie est requise.",
+      "ticketPriceInvalid": "Le prix du ticket doit être supérieur à 0.",
+      "maxTicketsInvalid": "Le nombre maximum de tickets doit être au moins 1.",
+      "endDateRequired": "La date de fin est requise.",
+      "endDateInPast": "La date de fin doit être dans le futur.",
+      "invalidStatus": "Statut invalide.",
+      "viabilityError": "Erreur de viabilité : revenu maximum ({maxTickets} × ${ticketPrice} = ${maxRevenue}) inférieur au montant du prix (${prizeAmount}). Augmentez le prix du ticket ou le nombre de tickets.",
+      "unauthorized": "Non autorisé.",
+      "competitionNotFound": "Compétition introuvable.",
+      "winnerAlreadyDrawn": "Un gagnant a déjà été tiré pour cette compétition.",
+      "notEligibleForDraw": "Cette compétition n'est pas encore éligible au tirage.",
+      "noTicketsForCompetition": "Aucun ticket trouvé pour cette compétition.",
+      "missingUserId": "Identifiant utilisateur manquant.",
+      "invalidRole": "Rôle invalide.",
+      "databaseError": "Erreur de base de données : {message}",
+      "saveWinnerFailed": "Échec de l'enregistrement du gagnant : {message}",
+      "errorWithMessage": "Erreur : {message}"
+    },
+    "recent": {
+      "colUser": "Utilisateur",
+      "colCompetition": "Compétition",
+      "colAmount": "Montant",
+      "colTickets": "Tickets",
+      "colDate": "Date"
+    }
   },
   "footer": {
     "tagline": "Gagnez votre portefeuille.",
@@ -406,5 +462,49 @@
     "s11Title": "11. Contact",
     "s11Text": "Pour toute question relative aux présentes Conditions, contactez-nous à legal@winuwallet.com.",
     "backHome": "Retour à l'accueil"
+  },
+  "emails": {
+    "welcome": {
+      "subject": "Bienvenue sur WinuWallet 🎉",
+      "heading": "Bienvenue sur WinuWallet !",
+      "subtitle": "Vous faites désormais partie de la plateforme de prix crypto la plus équitable du web. Voici comment ça marche :",
+      "step1Label": "① Choisissez une compétition",
+      "step1Value": "Parcourez les prix en cours",
+      "step2Label": "② Achetez des tickets",
+      "step2Value": "Paiement carte sécurisé",
+      "step3Label": "③ Gagnez du crypto",
+      "step3Value": "Tirages vérifiables",
+      "trustNote": "Chaque tirage utilise un aléatoire cryptographique vérifiable publiquement. Pas de pièges — juste une compétition équitable.",
+      "cta": "Voir les compétitions →",
+      "footer": "Vous vous êtes inscrit avec {email}. Si ce n'est pas vous, vous pouvez ignorer ce message en toute sécurité."
+    },
+    "purchase": {
+      "subjectSingle": "Votre ticket pour {title}",
+      "subjectMultiple": "Vos tickets pour {title}",
+      "heading": "Vous participez ! 🎟️",
+      "subtitle": "Votre paiement a été confirmé et vos tickets sont prêts. Bonne chance !",
+      "labelCompetition": "Compétition",
+      "labelTickets": "Tickets achetés",
+      "labelTotalPaid": "Total payé",
+      "ticketsCountSingle": "{count} ticket",
+      "ticketsCountPlural": "{count} tickets",
+      "yourTicketNumbers": "Vos numéros de tickets :",
+      "cta": "Voir la compétition →",
+      "footer": "Confirmation envoyée à {email}. Conservez cet email comme reçu."
+    },
+    "winner": {
+      "subject": "🏆 Vous avez gagné {amount} USD en {crypto} !",
+      "heading": "Félicitations, vous avez gagné ! 🏆",
+      "subtitle": "Votre ticket a été tiré comme gagnant pour {title}. Voici vos gains :",
+      "winPrize": "{amount} USD en {crypto}",
+      "winTicket": "Ticket gagnant : n°{number}",
+      "labelCompetition": "Compétition",
+      "labelPrize": "Prix",
+      "labelWinningTicket": "Ticket gagnant",
+      "claimTitle": "Comment réclamer votre prix :",
+      "claimText": "Notre équipe vous contactera sous 48 heures pour vérifier votre identité et organiser le transfert. Vérifiez que votre adresse de portefeuille est à jour dans les paramètres de votre compte. Ne partagez jamais votre confirmation de gain.",
+      "cta": "Aller au tableau de bord →",
+      "footer": "Cet email a été envoyé à {email}. Pour toute question, répondez directement à ce message."
+    }
   }
 }

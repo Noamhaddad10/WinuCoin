@@ -9,15 +9,15 @@ vi.mock('resend', () => ({
   })),
 }))
 
-// Mock email templates
+// Mock email templates (return Promises since the real ones are now async)
 vi.mock('@/lib/email-templates/welcome', () => ({
-  welcomeEmail: vi.fn().mockReturnValue({ subject: 'Welcome', html: '<p>Welcome</p>' }),
+  welcomeEmail: vi.fn().mockResolvedValue({ subject: 'Welcome', html: '<p>Welcome</p>' }),
 }))
 vi.mock('@/lib/email-templates/purchase-confirmation', () => ({
-  purchaseConfirmationEmail: vi.fn().mockReturnValue({ subject: 'Tickets', html: '<p>Tickets</p>' }),
+  purchaseConfirmationEmail: vi.fn().mockResolvedValue({ subject: 'Tickets', html: '<p>Tickets</p>' }),
 }))
 vi.mock('@/lib/email-templates/winner-announcement', () => ({
-  winnerAnnouncementEmail: vi.fn().mockReturnValue({ subject: 'Winner', html: '<p>Winner</p>' }),
+  winnerAnnouncementEmail: vi.fn().mockResolvedValue({ subject: 'Winner', html: '<p>Winner</p>' }),
 }))
 
 describe('email module', () => {
@@ -27,7 +27,7 @@ describe('email module', () => {
 
   it('sendWelcomeEmail does not throw when RESEND_API_KEY is set', async () => {
     const { sendWelcomeEmail } = await import('@/lib/email')
-    await expect(sendWelcomeEmail('test@example.com')).resolves.not.toThrow()
+    await expect(sendWelcomeEmail('test@example.com', 'en')).resolves.not.toThrow()
   })
 
   it('sendPurchaseConfirmation does not throw', async () => {
@@ -40,6 +40,7 @@ describe('email module', () => {
         ticketCount: 2,
         ticketNumbers: [1, 2],
         totalPaid: 20,
+        locale: 'en',
       }),
     ).resolves.not.toThrow()
   })
@@ -53,6 +54,7 @@ describe('email module', () => {
         prizeAmount: 1000,
         cryptoType: 'BTC',
         winningTicketNumber: 42,
+        locale: 'en',
       }),
     ).resolves.not.toThrow()
   })
@@ -63,7 +65,7 @@ describe('email module', () => {
 
     const { sendWelcomeEmail } = await import('@/lib/email')
     // Should not throw, just skip
-    await expect(sendWelcomeEmail('test@example.com')).resolves.not.toThrow()
+    await expect(sendWelcomeEmail('test@example.com', 'en')).resolves.not.toThrow()
 
     process.env.RESEND_API_KEY = originalKey
   })

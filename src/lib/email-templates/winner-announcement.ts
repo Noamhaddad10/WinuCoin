@@ -1,4 +1,10 @@
+import { createTranslator } from 'next-intl'
+import enMessages from '@/messages/en.json'
+import frMessages from '@/messages/fr.json'
 import { baseTemplate } from './base'
+
+type Messages = typeof enMessages
+const ALL_MESSAGES: Record<string, Messages> = { en: enMessages, fr: frMessages }
 
 interface WinnerAnnouncementOptions {
   email: string
@@ -6,58 +12,55 @@ interface WinnerAnnouncementOptions {
   prizeAmount: number
   cryptoType: string
   winningTicketNumber: number
+  locale: string
 }
 
-export function winnerAnnouncementEmail(opts: WinnerAnnouncementOptions): {
-  subject: string
-  html: string
-} {
-  const { email, competitionTitle, prizeAmount, cryptoType, winningTicketNumber } = opts
-  const subject = `🏆 You won ${new Intl.NumberFormat('en-US').format(prizeAmount)} USD in ${cryptoType}!`
+export async function winnerAnnouncementEmail(
+  opts: WinnerAnnouncementOptions,
+): Promise<{ subject: string; html: string }> {
+  const { email, competitionTitle, prizeAmount, cryptoType, winningTicketNumber, locale } = opts
+  const messages = ALL_MESSAGES[locale] ?? ALL_MESSAGES.en
+  const t = createTranslator({ locale, messages, namespace: 'emails.winner' })
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
+  const numberLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
+  const formattedAmount = new Intl.NumberFormat(numberLocale).format(prizeAmount)
+
+  const subject = t('subject', { amount: formattedAmount, crypto: cryptoType })
 
   const html = baseTemplate(
     subject,
-    `<h1 class="title">Congratulations! You won! 🏆</h1>
-    <p class="subtitle">
-      Your ticket was drawn as the winner for <strong>${competitionTitle}</strong>.
-      Here are your winnings:
-    </p>
+    `<h1 class="title">${t('heading')}</h1>
+    <p class="subtitle">${t('subtitle', { title: `<strong>${competitionTitle}</strong>` })}</p>
 
     <div class="win-box">
       <div class="win-emoji">🎉</div>
-      <div class="win-prize">$${new Intl.NumberFormat('en-US').format(prizeAmount)} USD in ${cryptoType}</div>
-      <div class="win-ticket">Winning ticket: #${winningTicketNumber}</div>
+      <div class="win-prize">$${t('winPrize', { amount: formattedAmount, crypto: cryptoType })}</div>
+      <div class="win-ticket">${t('winTicket', { number: winningTicketNumber })}</div>
     </div>
 
     <div class="info-box">
       <div class="info-row">
-        <span class="info-label">Competition</span>
+        <span class="info-label">${t('labelCompetition')}</span>
         <span class="info-value">${competitionTitle}</span>
       </div>
       <div class="info-row">
-        <span class="info-label">Prize</span>
-        <span class="info-value">$${new Intl.NumberFormat('en-US').format(prizeAmount)} in ${cryptoType}</span>
+        <span class="info-label">${t('labelPrize')}</span>
+        <span class="info-value">$${formattedAmount} ${cryptoType}</span>
       </div>
       <div class="info-row">
-        <span class="info-label">Winning Ticket</span>
+        <span class="info-label">${t('labelWinningTicket')}</span>
         <span class="info-value">#${winningTicketNumber}</span>
       </div>
     </div>
 
-    <p style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:8px;">How to claim your prize:</p>
-    <p style="font-size:14px;color:#64748b;line-height:1.7;margin-bottom:24px;">
-      Our team will contact you within 48 hours to verify your identity and arrange the prize transfer.
-      Please ensure your wallet address is up to date in your account settings.
-      Do not share your winning confirmation with anyone.
-    </p>
+    <p style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:8px;">${t('claimTitle')}</p>
+    <p style="font-size:14px;color:#64748b;line-height:1.7;margin-bottom:24px;">${t('claimText')}</p>
 
-    <a href="${appUrl}/en/dashboard" class="btn">
-      Go to My Dashboard →
-    </a>
+    <a href="${appUrl}/${locale}/dashboard" class="btn">${t('cta')}</a>
 
     <p style="font-size:13px;color:#94a3b8;margin-top:16px;">
-      This email was sent to <strong>${email}</strong>. If you have questions, reply to this email.
+      ${t('footer', { email: `<strong>${email}</strong>` })}
     </p>`,
   )
   return { subject, html }

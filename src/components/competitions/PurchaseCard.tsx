@@ -23,6 +23,7 @@ export function PurchaseCard({
   cryptoPrice,
 }: PurchaseCardProps) {
   const t = useTranslations('competitions')
+  const tCheckout = useTranslations('checkout')
 
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -59,7 +60,7 @@ export function PurchaseCard({
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? 'Something went wrong. Please try again.')
+        setError(data.error ?? tCheckout('errorGeneric'))
         return
       }
 
@@ -67,7 +68,7 @@ export function PurchaseCard({
         window.location.href = data.url
       }
     } catch {
-      setError('Could not connect. Please check your connection and try again.')
+      setError(tCheckout('errorNetwork'))
     } finally {
       setLoading(false)
     }

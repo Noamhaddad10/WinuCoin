@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { Ticket, Trophy, Award } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { fmtNumber, fmtDate } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -55,7 +56,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     user && profile
       ? supabase
           .from('tickets')
-          .select('id, ticket_number, created_at, competition_id, competitions(title)')
+          .select('id, ticket_number, created_at, competition_id, competitions(title, title_fr, title_en)')
           .eq('user_id', profile.id)
           .order('created_at', { ascending: false })
           .limit(20)
@@ -63,7 +64,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     user && profile
       ? supabase
           .from('winners')
-          .select('id, created_at, competitions(title, prize_amount, crypto_type), tickets(ticket_number)')
+          .select('id, created_at, competitions(title, title_fr, title_en, prize_amount, crypto_type), tickets(ticket_number)')
           .eq('user_id', profile.id)
       : Promise.resolve({ data: [] }),
   ])
@@ -100,7 +101,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           {userWins && userWins.length > 0 && (
             <div className="mt-6 space-y-3">
               {userWins.map((win) => {
-                const comp = (win.competitions as unknown as { title: string; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                const compRaw = (win.competitions as unknown as { title: string; title_fr: string | null; title_en: string | null; prize_amount: number; crypto_type: string }[] | null)?.[0] ?? null
+                const comp = compRaw
+                  ? { ...compRaw, ...localizeCompetition(compRaw, locale) }
+                  : null
                 const ticket = (win.tickets as unknown as { ticket_number: number }[] | null)?.[0] ?? null
                 return (
                   <div
@@ -112,10 +116,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-amber-900 dark:text-amber-100">
-                        You won {fmtNumber(comp?.prize_amount ?? 0)} USD in {comp?.crypto_type}!
+                        {t('youWonBanner', {
+                          amount: fmtNumber(comp?.prize_amount ?? 0),
+                          crypto: comp?.crypto_type ?? '',
+                        })}
                       </p>
                       <p className="text-sm text-amber-700 dark:text-amber-300">
-                        {comp?.title} · Winning ticket{' '}
+                        {t('winningTicketLine', { title: comp?.title ?? '' })}{' '}
                         <span className="font-mono font-bold">#{ticket?.ticket_number}</span>
                       </p>
                     </div>
@@ -158,7 +165,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                     {t('ticketNumber')}
                   </span>
                   <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Competition
+                    {t('competition')}
                   </span>
                   <span className="text-right text-xs font-semibold uppercase tracking-wide text-slate-400">
                     {t('date')}
@@ -190,7 +197,12 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                       href={`/${locale}/competitions/${ticket.competition_id}`}
                       className="truncate text-sm text-indigo-600 hover:underline dark:text-indigo-400"
                     >
-                      {(ticket.competitions as unknown as { title: string } | null)?.title ?? 'View →'}
+                      {(() => {
+                        const compRow = ticket.competitions as unknown as
+                          | { title: string; title_fr: string | null; title_en: string | null }
+                          | null
+                        return compRow ? localizeCompetition(compRow, locale).title : t('viewLink')
+                      })()}
                     </Link>
                     <span className="text-right text-xs text-slate-400">
                       {fmtDate(ticket.created_at)}

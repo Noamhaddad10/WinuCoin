@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { DrawWinnerClient } from '@/components/admin/DrawWinnerClient'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -50,12 +51,14 @@ export default async function DrawWinnerPage({ params }: PageProps) {
 
       <div className="mt-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('drawTitle')}</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{competition.title}</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          {localizeCompetition(competition, locale).title}
+        </p>
       </div>
 
       <div className="mt-6 max-w-2xl">
         <DrawWinnerClient
-          competition={competition}
+          competition={{ ...competition, ...localizeCompetition(competition, locale) }}
           tickets={tickets ?? []}
           existingWinner={
             existingWinner

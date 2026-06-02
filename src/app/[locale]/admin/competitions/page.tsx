@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Plus, Pencil, Shuffle, ExternalLink } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fmtNumber, fmtDate } from '@/lib/format'
+import { localizeCompetition } from '@/lib/competition-i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin')
@@ -27,7 +28,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
   const admin = createAdminClient()
   const { data: competitions } = await admin
     .from('competitions')
-    .select('id, slug, title, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn, is_published')
+    .select('id, slug, title, title_fr, title_en, prize_amount, crypto_type, ticket_price, tickets_sold, max_tickets, status, end_date, winner_drawn, is_published')
     .order('created_at', { ascending: false })
 
   return (
@@ -38,7 +39,7 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
             {t('allCompetitions')}
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {competitions?.length ?? 0} total
+            {competitions?.length ?? 0} {t('countTotal')}
           </p>
         </div>
         <Link
@@ -69,11 +70,11 @@ export default async function AdminCompetitionsPage({ params }: PageProps) {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
-                    {c.title}
+                    {localizeCompetition(c, locale).title}
                   </p>
                   {!c.is_published && (
                     <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
-                      Draft
+                      {t('draftBadge')}
                     </span>
                   )}
                 </div>
