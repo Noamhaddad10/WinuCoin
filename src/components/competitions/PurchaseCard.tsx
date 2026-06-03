@@ -26,6 +26,7 @@ export function PurchaseCard({
   const tCheckout = useTranslations('checkout')
 
   const [quantity, setQuantity] = useState(1)
+  const [customInput, setCustomInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,8 +38,19 @@ export function PurchaseCard({
 
   const total = competition.ticket_price * quantity
 
-  function handleQuantityChange(val: number) {
+  function handlePresetClick(val: number) {
     setQuantity(Math.max(1, Math.min(maxQty, val)))
+    setCustomInput('')
+  }
+
+  function handleCustomInput(raw: string) {
+    // Strip non-digits to keep the input clean while typing
+    const cleaned = raw.replace(/[^\d]/g, '')
+    setCustomInput(cleaned)
+    if (cleaned === '') return
+    const n = Number(cleaned)
+    if (!Number.isFinite(n) || n < 1) return
+    setQuantity(Math.max(1, Math.min(maxQty, n)))
   }
 
   async function handleBuy() {
@@ -110,33 +122,47 @@ export function PurchaseCard({
                 {t('quantity')}
               </label>
 
-              {/* Quick-select buttons */}
+              {/* Quick-select buttons + custom input */}
               <div className="mt-2 flex gap-2">
-                {QUICK_AMOUNTS.filter((n) => n <= maxQty).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => handleQuantityChange(n)}
-                    aria-label={`${n} ticket${n > 1 ? 's' : ''}`}
-                    className={[
-                      'flex-1 rounded-xl border py-2 text-sm font-semibold transition-all',
-                      quantity === n
-                        ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300',
-                    ].join(' ')}
-                  >
-                    {n}
-                  </button>
-                ))}
-                {/* Custom input */}
+                {QUICK_AMOUNTS.filter((n) => n <= maxQty).map((n) => {
+                  const isActive = customInput === '' && quantity === n
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => handlePresetClick(n)}
+                      aria-label={`${n} ticket${n > 1 ? 's' : ''}`}
+                      aria-pressed={isActive}
+                      className={[
+                        'flex-1 rounded-xl border py-2 text-sm font-semibold transition-all',
+                        isActive
+                          ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300',
+                      ].join(' ')}
+                    >
+                      {n}
+                    </button>
+                  )
+                })}
+                {/* Custom input — same height/radius as the preset buttons,
+                    visually distinct via dashed border so it doesn't look
+                    like a "1" preset. */}
                 <div className="flex-1">
                   <input
                     type="number"
+                    inputMode="numeric"
                     min={1}
                     max={maxQty}
-                    value={quantity}
-                    onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                    value={customInput}
+                    onChange={(e) => handleCustomInput(e.target.value)}
                     placeholder={t('enterAmount')}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 text-center text-sm font-semibold text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-300"
+                    aria-label={t('customQuantity')}
+                    className={[
+                      'w-full appearance-none rounded-xl border-2 border-dashed py-2 text-center text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400/20',
+                      customInput !== ''
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/40 dark:text-indigo-200'
+                        : 'border-slate-300 bg-transparent text-slate-700 placeholder:text-slate-400 hover:border-indigo-300 dark:border-zinc-600 dark:text-slate-300 dark:placeholder:text-slate-500',
+                    ].join(' ')}
                   />
                 </div>
               </div>

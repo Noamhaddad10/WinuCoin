@@ -16,7 +16,8 @@
     "dashboard": "Dashboard",
     "admin": "Admin",
     "login": "Sign In",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "ariaMain": "Main navigation"
   },
   "auth": {
     "signIn": "Sign in to WinuWallet",
@@ -60,6 +61,7 @@
     "statsDistributed": "Distributed",
     "statsTickets": "Tickets Sold",
     "competitionsTitle": "Live Competitions",
+    "competitionsSubtitle": "All draws are open. Pick yours and enter today.",
     "noCompetitions": "No active competitions right now. Check back soon.",
     "viewAll": "View all competitions",
     "howItWorks": "How It Works",
@@ -128,6 +130,7 @@
     "prizeApprox": "at current rate",
     "prizeDisclaimer": "Prize is fixed at the GBP value shown. Crypto equivalent is indicative and calculated at the time of draw.",
     "endsIn": "Ends in",
+    "countdownAriaLabel": "Time remaining until the competition ends",
     "countdownDays": "Days",
     "countdownHours": "Hours",
     "countdownMin": "Min",
@@ -135,6 +138,8 @@
     "progressSold": "{percent}% sold · {remaining} tickets remaining",
     "winnerDrawn": "Winner Drawn!",
     "winnerTicketLine": "Ticket #{number}",
+    "beFirstToEnter": "Be the first to enter!",
+    "customQuantity": "Custom quantity",
     "detailsTitle": "Competition Details",
     "detailsCrypto": "Cryptocurrency",
     "detailsMaxTickets": "Max tickets",
@@ -334,12 +339,15 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "copyright": "© {year} WinuWallet Ltd. All rights reserved."
+    "copyright": "© {year} WinuWallet Ltd. All rights reserved.",
+    "registeredInfo": "WinuWallet Ltd — a company registered in England and Wales. Prize competitions operate under the Gambling Act 2005 (applicable exemption).",
+    "ageWarning": "18+ · Please play responsibly.",
+    "ariaSocial": "Social links"
   },
   "phoneMockup": {
     "competitions": "Competitions",
-    "card1Name": "Win £250K in BNB",
-    "card2Name": "Win £100K in ETH",
+    "card1Name": "Win BTC",
+    "card2Name": "Win ETH",
     "live": "LIVE",
     "tickets": "tickets",
     "ticket": "ticket",
@@ -351,7 +359,7 @@
     "total": "Total",
     "payWithStripe": "Pay with Stripe",
     "congratulations": "Congratulations!",
-    "youWon": "You won BNB!",
+    "youWon": "You won BTC!",
     "sentToWallet": "Sent to your wallet ✓",
     "txHash": "Transaction hash"
   },

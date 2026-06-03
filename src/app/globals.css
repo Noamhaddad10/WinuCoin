@@ -2,6 +2,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Smooth scroll for in-page anchors (e.g. "How It Works" → #how-it-works).
+ * Disabled automatically when prefers-reduced-motion is set. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem; /* clears the sticky header */
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }

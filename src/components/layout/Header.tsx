@@ -114,13 +114,16 @@ export function Header({ locale, isAuthenticated: initialAuth, isAdmin: initialA
             className="flex items-center gap-2.5 font-bold text-slate-900 dark:text-slate-100"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 shadow-sm">
-              <span className="text-xs font-black text-white">W</span>
+              <span aria-hidden="true" className="text-xs font-black text-white">W</span>
             </div>
             <span className="text-base">WinuWallet</span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-0.5 sm:flex">
+          <nav
+            aria-label={t('nav.ariaMain')}
+            className="hidden items-center gap-0.5 sm:flex"
+          >
             <Link
               href={`/${locale}`}
               title={t('nav.home')}
@@ -203,7 +206,7 @@ export function Header({ locale, isAuthenticated: initialAuth, isAdmin: initialA
                 className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-purple-600">
-                  <span className="text-xs font-black text-white">W</span>
+                  <span aria-hidden="true" className="text-xs font-black text-white">W</span>
                 </div>
                 WinuWallet
               </Link>
@@ -217,7 +220,10 @@ export function Header({ locale, isAuthenticated: initialAuth, isAdmin: initialA
             </div>
 
             {/* Drawer nav */}
-            <nav className="flex flex-col gap-1 p-4">
+            <nav
+              aria-label={t('nav.ariaMain')}
+              className="flex flex-col gap-1 p-4"
+            >
               <Link
                 href={`/${locale}`}
                 onClick={() => setMobileOpen(false)}

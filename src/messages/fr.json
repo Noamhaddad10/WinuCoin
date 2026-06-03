@@ -16,7 +16,8 @@
     "dashboard": "Tableau de bord",
     "admin": "Admin",
     "login": "Connexion",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "ariaMain": "Navigation principale"
   },
   "auth": {
     "signIn": "Connexion à WinuWallet",
@@ -60,6 +61,7 @@
     "statsDistributed": "Distribués",
     "statsTickets": "Tickets vendus",
     "competitionsTitle": "Compétitions en direct",
+    "competitionsSubtitle": "Toutes les compétitions sont ouvertes. Choisissez la vôtre et participez aujourd'hui.",
     "noCompetitions": "Aucune compétition active pour le moment. Revenez bientôt.",
     "viewAll": "Voir toutes les compétitions",
     "howItWorks": "Comment ça marche",
@@ -128,6 +130,7 @@
     "prizeApprox": "au taux actuel",
     "prizeDisclaimer": "Le prix est fixé à la valeur en £ indiquée. L'équivalent en crypto est indicatif et calculé au moment du tirage.",
     "endsIn": "Se termine dans",
+    "countdownAriaLabel": "Temps restant avant la fin de la compétition",
     "countdownDays": "Jours",
     "countdownHours": "Heures",
     "countdownMin": "Min",
@@ -135,6 +138,8 @@
     "progressSold": "{percent}% vendus · {remaining} tickets restants",
     "winnerDrawn": "Gagnant tiré !",
     "winnerTicketLine": "Ticket n°{number}",
+    "beFirstToEnter": "Soyez le premier à participer !",
+    "customQuantity": "Quantité personnalisée",
     "detailsTitle": "Détails de la compétition",
     "detailsCrypto": "Cryptomonnaie",
     "detailsMaxTickets": "Tickets maximum",
@@ -334,12 +339,15 @@
     "contact": "Contact",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
-    "copyright": "© {year} WinuWallet Ltd. Tous droits réservés."
+    "copyright": "© {year} WinuWallet Ltd. Tous droits réservés.",
+    "registeredInfo": "WinuWallet Ltd — société enregistrée en Angleterre et au Pays de Galles. Compétitions de prix conformes au Gambling Act 2005 (exemption applicable).",
+    "ageWarning": "18+ · Jouez de manière responsable.",
+    "ariaSocial": "Liens sociaux"
   },
   "phoneMockup": {
     "competitions": "Compétitions",
-    "card1Name": "Gagnez £250K en BNB",
-    "card2Name": "Gagnez £100K en ETH",
+    "card1Name": "Gagnez du BTC",
+    "card2Name": "Gagnez de l'ETH",
     "live": "EN DIRECT",
     "tickets": "tickets",
     "ticket": "ticket",
@@ -351,7 +359,7 @@
     "total": "Total",
     "payWithStripe": "Payer avec Stripe",
     "congratulations": "Félicitations !",
-    "youWon": "Vous avez gagné du BNB !",
+    "youWon": "Vous avez gagné du BTC !",
     "sentToWallet": "Envoyé dans votre portefeuille ✓",
     "txHash": "Hash de transaction"
   },

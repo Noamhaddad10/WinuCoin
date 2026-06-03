@@ -257,23 +257,31 @@ export default async function CompetitionDetailPage({
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div className="mt-4">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/20">
-              <div
-                className="h-full rounded-full bg-white/70 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="mt-1 text-xs text-white/45">
-              {t('progressSold', {
-                percent: progress,
-                remaining: fmtNumber(competition.max_tickets - competition.tickets_sold),
-              })}
+          {/* Progress bar (hidden for empty pools to avoid signalling "deserted") */}
+          {competition.tickets_sold === 0 && !isEnded ? (
+            <p className="mt-4 text-xs text-white/70">
+              ✨ {t('beFirstToEnter')}
               <span className="mx-2 opacity-40">·</span>
               <span className="opacity-40">{t('prizeDisclaimer')}</span>
             </p>
-          </div>
+          ) : (
+            <div className="mt-4">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/20">
+                <div
+                  className="h-full rounded-full bg-white/70 transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-white/45">
+                {t('progressSold', {
+                  percent: progress,
+                  remaining: fmtNumber(competition.max_tickets - competition.tickets_sold),
+                })}
+                <span className="mx-2 opacity-40">·</span>
+                <span className="opacity-40">{t('prizeDisclaimer')}</span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

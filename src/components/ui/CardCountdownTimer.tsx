@@ -106,10 +106,22 @@ export function CardCountdownTimer({ endDate, dark = false, size = 'sm' }: Props
   // Separator (colon) between units for lg size
   const showSeparator = isLg
 
+  const srLabel = `${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m`
+
   return (
-    <div className={`flex items-start ${gapClass}`}>
+    <div
+      role="timer"
+      aria-label={t('countdownAriaLabel')}
+      aria-live="off"
+      className={`flex items-start ${gapClass}`}
+    >
+      {/* Screen-reader-friendly summary, refreshed at minute granularity to avoid
+          per-second interruptions. The visual countdown below is decorative. */}
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {srLabel}
+      </span>
       {units.map(({ value, label }, i) => (
-        <div key={i} className="flex items-start">
+        <div key={i} className="flex items-start" aria-hidden="true">
           <div className="flex flex-col items-center">
             <span className={boxClass}>{value}</span>
             <span className={labelClass}>{label}</span>

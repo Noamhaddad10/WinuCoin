@@ -191,7 +191,7 @@ export default async function HomePage({ params }: HomePageProps) {
               {/* Gradient accent underline */}
               <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600" />
               <p className="mt-3 text-slate-500 dark:text-slate-400">
-                {t('heroSubtitle').split('.')[0]}.
+                {t('competitionsSubtitle')}
               </p>
             </div>
 

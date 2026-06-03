@@ -91,7 +91,12 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {t('welcomeBack')}
               {displayName && (
-                <span className="text-indigo-600 dark:text-indigo-400"> {displayName.split('@')[0]}</span>
+                <>
+                  ,{' '}
+                  <span className="text-indigo-600 dark:text-indigo-400">
+                    {displayName.split('@')[0]}
+                  </span>
+                </>
               )}
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('title')}</p>

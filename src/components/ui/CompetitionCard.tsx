@@ -145,16 +145,24 @@ export function CompetitionCard({ competition, locale }: CompetitionCardProps) {
 
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>{competition.tickets_sold}/{competition.max_tickets}</span>
-            <span className="font-semibold">{progress}%</span>
-          </div>
-          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-800">
-            <div
-              className={`h-full rounded-full bg-gradient-to-r ${progressGradient} transition-all duration-500`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          {competition.tickets_sold === 0 && !isEnded ? (
+            <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+              ✨ {t('beFirstToEnter')}
+            </p>
+          ) : (
+            <>
+              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span>{competition.tickets_sold}/{competition.max_tickets}</span>
+                <span className="font-semibold">{progress}%</span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-800">
+                <div
+                  className={`h-full rounded-full bg-gradient-to-r ${progressGradient} transition-all duration-500`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
